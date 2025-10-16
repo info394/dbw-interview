@@ -68,3 +68,10 @@ app.delete('/api/applicants/:id', async (req, res) => {
 // ✅ Use Render-compatible port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
+app.use(express.static('public'));
+
+app.get('/', (req, res) => {
+  res.send('✅ Backend is running successfully!');
+});
+
