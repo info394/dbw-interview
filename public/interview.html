@@ -10,20 +10,78 @@ h1 { color: #004a99; margin-bottom: 10px; }
 h2.subheading, h3.subheading { color: #004a99; font-weight: 400; margin: 5px 0; font-size: 18px; }
 h3.subheading { padding-bottom: 30px; }
 #breadcrumb { margin: 10px 0; font-size:14px; color:#004a99; }
-.btn { padding: 14px 22px; margin: 5px; font-size: 16px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: 0.3s; }
+.btn {
+  padding: 14px 22px;
+  margin: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  /* added transition for smooth hover */
+}
 .btn-category { background: #004a99; color: white; }
 .btn-year, .btn-month { background: #0066cc; color: white; }
 .btn-date { background: #66ccff; color: white; }
 .btn-active { background: white !important; color: #004a99 !important; border: 1px solid #004a99; }
-.btn:hover { opacity: 0.8; }
+
+/* Hover effect for all buttons */
+.btn:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 74, 153, 0.3);
+}
+
 .section { margin-top: 20px; display: none; }
 .date-input-container { margin-top: 20px; }
 .date-input { padding: 6px; width: 150px; font-size: 14px; margin-right: 6px; }
-.added-date { display: inline-block; background: #66ccff; color: #004a99; padding: 4px 8px; margin: 4px; border-radius: 6px; cursor: default; }
-.added-date span { margin-left: 6px; font-weight: bold; cursor: pointer; }
+
+/* Updated Add Date Button */
+#addDateBtn {
+  background: linear-gradient(135deg, #007bff, #004a99);
+  box-shadow: 0 4px 8px rgba(0, 74, 153, 0.4);
+  border-radius: 12px;
+  padding: 14px 22px;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+#addDateBtn:hover {
+  background: linear-gradient(135deg, #0056b3, #003366);
+  box-shadow: 0 6px 12px rgba(0, 74, 153, 0.6);
+  transform: scale(1.05);
+}
+
+.added-date {
+  display: inline-block;
+  background: #66ccff;
+  color: #004a99;
+  padding: 4px 8px;
+  margin: 4px;
+  border-radius: 6px;
+  cursor: default;
+}
+.added-date span {
+  margin-left: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 12px; /* smaller */
+  color: red;      /* red */
+}
+
 .profiles-wrapper { display: flex; flex-wrap: wrap; justify-content: flex-start; margin-top: 20px; }
 .profile-container { background: #ffffff; border-radius: 8px; padding: 12px; margin: 5px; width: 300px; text-align: left; font-size: 12px; box-shadow: 2px 2px 8px #cbd8e6, -2px -2px 8px #f7faff; }
-.profile-title { font-weight: 600; color: #004a99; margin-bottom: 6px; text-align:center; }
+.profile-title {
+  font-weight: 600;
+  color: #004a99;
+  margin-bottom: 6px;
+  text-align: left; /* left aligned */
+  padding-left: 2px; /* added */
+}
 .profile-table { width: 100%; border-collapse: collapse; }
 .profile-table td { padding: 4px 6px; }
 .label { width: 40%; font-weight: 500; color: #004a99; text-align: left; }
@@ -31,11 +89,28 @@ h3.subheading { padding-bottom: 30px; }
 .editable:focus { border: 1px solid #ff944d; outline: none; background-color: #fffefc; }
 select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; background:rgb(0, 153, 255); color:white; width:100%; }
 .time-input { background:yellow; width:95%; padding:4px; border-radius:4px; border:none; color:black; }
+
 #addMoreBtn { margin-top: 10px; }
-#saveBtn, #clearBtn, #logoutBtn { margin-top: 20px; padding: 10px 20px; font-size: 14px; cursor: pointer; border-radius: 8px; border:none; color:white; }
+#saveBtn, #clearBtn, #logoutBtn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 8px;
+  border:none;
+  color:white;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
 #saveBtn { background:#004a99; }
 #clearBtn { background:#cc3300; margin-left: 10px; }
 #logoutBtn { background:#666666; margin-left: 10px; }
+
+/* Additional hover for bottom buttons */
+#saveBtn:hover, #clearBtn:hover, #logoutBtn:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 74, 153, 0.3);
+}
 </style>
 </head>
 <body>
@@ -140,196 +215,304 @@ function goBack(level) {
   else if(level==='year'){ selectedYear=selectedMonth=selectedDate=null; }
   else if(level==='month'){ selectedMonth=selectedDate=null; }
   else if(level==='date'){ selectedDate=null; }
-  profilesWrapper.innerHTML = '';
-  addMoreBtn.style.display='none';
-  yearContainer.style.display = monthContainer.style.display = dateContainer.style.display = 'none';
-  addedDatesDiv.innerHTML = '';
   renderCategories();
-  if(selectedCategory) renderYears();
-  if(selectedYear) renderMonths();
-  updateBreadcrumb();
+}
+
+function clearSections(fromLevel) {
+  if(fromLevel==='category') { yearContainer.style.display='none'; monthContainer.style.display='none'; dateContainer.style.display='none'; profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; }
+  else if(fromLevel==='year') { monthContainer.style.display='none'; dateContainer.style.display='none'; profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; }
+  else if(fromLevel==='month') { dateContainer.style.display='none'; profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; }
+  else if(fromLevel==='date') { profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; }
 }
 
 // 🔹 RENDER FUNCTIONS
 function renderCategories() {
-  categoryContainer.innerHTML = '';
-  categories.forEach(c=>{
-    const btn = document.createElement('button');
-    btn.textContent=c;
-    btn.className='btn btn-category';
-    btn.onclick = ()=>{
-      selectedCategory=c;
-      yearContainer.style.display='block';
-      renderYears();
-      updateBreadcrumb();
-    };
-    categoryContainer.appendChild(btn);
-  });
-}
-function renderYears() {
-  yearContainer.innerHTML='';
-  years.forEach(y=>{
-    const btn=document.createElement('button');
-    btn.textContent=y;
-    btn.className='btn btn-year';
-    btn.onclick=()=>{
-      selectedYear=y;
-      monthContainer.style.display='block';
-      renderMonths();
-      updateBreadcrumb();
-    };
-    yearContainer.appendChild(btn);
-  });
-}
-function renderMonths() {
-  monthContainer.innerHTML='';
-  months.forEach(m=>{
-    const btn=document.createElement('button');
-    btn.textContent=m;
-    btn.className='btn btn-month';
-    btn.onclick=()=>{
-      selectedMonth=m;
-      dateContainer.style.display='block';
-      updateBreadcrumb();
-    };
-    monthContainer.appendChild(btn);
-  });
-}
-
-// 🔹 DATE INPUT
-function renderAddedDate() {
-  addedDatesDiv.innerHTML = '';
-  if (selectedDate) {
-    const dateBox = document.createElement('div');
-    dateBox.className = 'added-date';
-    dateBox.textContent = selectedDate;
-    const delSpan = document.createElement('span');
-    delSpan.textContent = '✕';
-    delSpan.onclick = () => {
-      selectedDate = null;
-      profilesWrapper.innerHTML = '';
-      addMoreBtn.style.display = 'none';
-      renderAddedDate();
-      updateBreadcrumb();
-    };
-    dateBox.appendChild(delSpan);
-    addedDatesDiv.appendChild(dateBox);
-  }
-}
-
-document.getElementById('addDateBtn').onclick = ()=>{
-  const dateVal = document.getElementById('dateInput').value.trim();
-  if(!dateVal){ alert('Enter a date (YYYY-MM-DD)'); return; }
-  selectedDate = dateVal;
-  addMoreBtn.style.display='block';
-  profilesWrapper.innerHTML='';
-  renderAddedDate();
+  clearSections('category');
   updateBreadcrumb();
-};
+  categoryContainer.innerHTML = categories.map(cat => `<button class="btn btn-category">${cat}</button>`).join('');
+  yearContainer.style.display = 'none';
+  monthContainer.style.display = 'none';
+  dateContainer.style.display = 'none';
+  addMoreBtn.style.display = 'none';
+  profilesWrapper.innerHTML = '';
 
-// 🔹 APPLICANT CARDS
-function createApplicantDiv(applicant){
-  const div = document.createElement('div');
-  div.className='profile-container';
-  div.innerHTML=`
-    <div class="profile-title">Applicant (${selectedDate || ''})</div>
-    <table class="profile-table">
-      <tr><td class="label">Name:</td><td><span class="editable" contenteditable="true">${applicant.name||''}</span></td></tr>
-      <tr><td class="label">Visa:</td><td><span class="editable" contenteditable="true">${applicant.visa||''}</span></td></tr>
-      <tr><td class="label">Nationality:</td><td><select class="nationality-select">${nationalities.map(n=>`<option ${applicant.nationality===n?'selected':''}>${n}</option>`)}</select></td></tr>
-      <tr><td class="label">Salary:</td><td><span class="editable" contenteditable="true">${applicant.salary||''}</span></td></tr>
-      <tr><td class="label">Education:</td><td><select class="education-select">${educationList.map(e=>`<option ${applicant.education===e?'selected':''}>${e}</option>`)}</select></td></tr>
-      <tr><td class="label">Contact:</td><td><span class="editable" contenteditable="true">${applicant.contact||''}</span></td></tr>
-      <tr><td class="label">Email:</td><td><span class="editable" contenteditable="true">${applicant.email||''}</span></td></tr>
-      <tr><td class="label">Time:</td><td><input type="time" class="time-input" value="${applicant.time||''}"></td></tr>
-      <tr><td class="label">Status:</td><td>
-        <select class="status-select">
-          <option ${applicant.status==='Accepted'?'selected':''}>Accepted</option>
-          <option ${applicant.status==='Rejected'?'selected':''}>Rejected</option>
-          <option ${applicant.status==='Did Not Show Up'?'selected':''}>Did Not Show Up</option>
-          <option ${!['Accepted','Rejected','Did Not Show Up'].includes(applicant.status)?'selected':''}>Pending</option>
-        </select>
-      </td></tr>
-    </table>
-    <div style="text-align:center;margin-top:6px;">
-      <button class="btn btn-month save-btn">Save</button>
-      <button class="btn btn-month remove-btn" style="background:#cc3300;">Remove</button>
-    </div>
-  `;
-  div.querySelector('.save-btn').onclick = async ()=>{
-    const editable=div.querySelectorAll('span.editable');
-    const updated={
-      id: applicant.id,
-      name: editable[0].textContent,
-      visa: editable[1].textContent,
-      nationality: div.querySelector('.nationality-select').value,
-      salary: editable[2].textContent,
-      education: div.querySelector('.education-select').value,
-      contact: editable[3].textContent,
-      email: editable[4].textContent,
-      time: div.querySelector('.time-input').value,
-      status: div.querySelector('.status-select').value,
-      category:selectedCategory,
-      year:selectedYear,
-      month:selectedMonth,
-      date:selectedDate
+  // Add event listeners to category buttons
+  categoryContainer.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => {
+      selectedCategory = btn.textContent;
+      renderYears();
     };
-    await saveApplicantToServer(updated);
-    alert('Applicant saved!');
-    loadFromServer();
-  };
-  div.querySelector('.remove-btn').onclick = async ()=>{
-    if(applicant.id) await deleteApplicantFromServer(applicant.id);
-    div.remove();
-  };
-  return div;
+  });
 }
 
-// 🔹 BUTTON EVENTS
-addMoreBtn.onclick = ()=>{
-  const newApp={category:selectedCategory, year:selectedYear, month:selectedMonth, date:selectedDate};
-  const div = createApplicantDiv(newApp);
-  profilesWrapper.appendChild(div);
-};
+function renderYears() {
+  clearSections('year');
+  updateBreadcrumb();
+  yearContainer.style.display = 'block';
+  yearContainer.innerHTML = years.map(y => `<button class="btn btn-year">${y}</button>`).join('');
 
-document.getElementById('saveBtn').onclick = async ()=>{
-  const allDivs=profilesWrapper.querySelectorAll('.profile-container');
-  for(let div of allDivs){
-    const editable=div.querySelectorAll('span.editable');
-    const updated={
-      name: editable[0].textContent,
-      visa: editable[1].textContent,
-      nationality: div.querySelector('.nationality-select').value,
-      salary: editable[2].textContent,
-      education: div.querySelector('.education-select').value,
-      contact: editable[3].textContent,
-      email: editable[4].textContent,
-      time: div.querySelector('.time-input').value,
-      status: div.querySelector('.status-select').value,
-      category:selectedCategory, year:selectedYear, month:selectedMonth, date:selectedDate
+  monthContainer.style.display = 'none';
+  dateContainer.style.display = 'none';
+  addMoreBtn.style.display = 'none';
+  profilesWrapper.innerHTML = '';
+
+  yearContainer.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => {
+      selectedYear = btn.textContent;
+      renderMonths();
     };
-    await saveApplicantToServer(updated);
+  });
+}
+
+function renderMonths() {
+  clearSections('month');
+  updateBreadcrumb();
+  monthContainer.style.display = 'block';
+  monthContainer.innerHTML = months.map(m => `<button class="btn btn-month">${m}</button>`).join('');
+
+  dateContainer.style.display = 'none';
+  addMoreBtn.style.display = 'none';
+  profilesWrapper.innerHTML = '';
+
+  monthContainer.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => {
+      selectedMonth = btn.textContent;
+      renderDates();
+    };
+  });
+}
+
+function renderDates() {
+  clearSections('date');
+  updateBreadcrumb();
+  dateContainer.style.display = 'block';
+  addMoreBtn.style.display = 'none';
+  profilesWrapper.innerHTML = '';
+  addedDatesDiv.innerHTML = '';
+
+  // Show existing dates for selected path
+  let dates = [];
+  try {
+    dates = Object.keys(interviewData[selectedCategory][selectedYear][selectedMonth]);
+  } catch {
+    dates = [];
   }
-  alert('All applicants saved!');
-  loadFromServer();
-};
 
-clearBtn.onclick = async ()=>{
-  if(confirm('Delete all applicants?')){
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    for(let a of data) await deleteApplicantFromServer(a.id);
-    profilesWrapper.innerHTML='';
-    alert('All cleared!');
+  dates.forEach(date => {
+    addDateTag(date);
+  });
+}
+
+function addDateTag(date) {
+  const span = document.createElement('span');
+  span.className = 'added-date';
+  span.textContent = date;
+  const cross = document.createElement('span');
+  cross.textContent = '✕';
+  cross.onclick = () => {
+    if(confirm(`Delete date ${date} and all applicants?`)) {
+      deleteDate(date);
+    }
+  };
+  span.appendChild(cross);
+  addedDatesDiv.appendChild(span);
+
+  // Clicking date loads profiles
+  span.onclick = e => {
+    if(e.target === cross) return; // avoid double action
+    selectedDate = date;
+    renderProfiles();
+  };
+}
+
+function deleteDate(date) {
+  // Remove all applicants for this date from data and server
+  if(interviewData[selectedCategory]?.[selectedYear]?.[selectedMonth]?.[date]){
+    const applicants = interviewData[selectedCategory][selectedYear][selectedMonth][date];
+    applicants.forEach(applicant => {
+      if(applicant._id) deleteApplicantFromServer(applicant._id);
+    });
+    delete interviewData[selectedCategory][selectedYear][selectedMonth][date];
+    renderDates();
+    profilesWrapper.innerHTML = '';
+    addMoreBtn.style.display = 'none';
   }
+}
+
+function renderProfiles() {
+  profilesWrapper.innerHTML = '';
+  addMoreBtn.style.display = 'inline-block';
+
+  const applicants = interviewData[selectedCategory]?.[selectedYear]?.[selectedMonth]?.[selectedDate] || [];
+
+  applicants.forEach(applicant => {
+    profilesWrapper.appendChild(createProfileCard(applicant));
+  });
+}
+
+function createProfileCard(applicant) {
+  const container = document.createElement('div');
+  container.className = 'profile-container';
+
+  const title = document.createElement('div');
+  title.className = 'profile-title';
+  title.textContent = applicant.name || "Unnamed Applicant";
+
+  container.appendChild(title);
+
+  const table = document.createElement('table');
+  table.className = 'profile-table';
+
+  // Utility to create row
+  function addRow(label, value, key, isEditable, inputType, options) {
+    const tr = document.createElement('tr');
+    const tdLabel = document.createElement('td');
+    tdLabel.className = 'label';
+    tdLabel.textContent = label;
+    const tdValue = document.createElement('td');
+
+    if(isEditable) {
+      if(inputType === 'select') {
+        const select = document.createElement('select');
+        options.forEach(opt => {
+          const option = document.createElement('option');
+          option.value = opt;
+          option.text = opt;
+          if(opt === value) option.selected = true;
+          select.appendChild(option);
+        });
+        select.onchange = e => {
+          applicant[key] = e.target.value;
+          saveApplicantToServer(applicant);
+        };
+        tdValue.appendChild(select);
+      } else if(inputType === 'time') {
+        const input = document.createElement('input');
+        input.type = 'time';
+        input.className = 'time-input';
+        input.value = value || '';
+        input.onchange = e => {
+          applicant[key] = e.target.value;
+          saveApplicantToServer(applicant);
+        };
+        tdValue.appendChild(input);
+      } else if(inputType === 'editable') {
+        const span = document.createElement('span');
+        span.className = 'editable';
+        span.contentEditable = true;
+        span.textContent = value || '';
+        span.onblur = e => {
+          applicant[key] = e.target.textContent.trim();
+          saveApplicantToServer(applicant);
+          span.textContent = applicant[key]; // sanitize and re-set
+        };
+        tdValue.appendChild(span);
+      }
+    } else {
+      tdValue.textContent = value || '';
+    }
+
+    tr.appendChild(tdLabel);
+    tr.appendChild(tdValue);
+    table.appendChild(tr);
+  }
+
+  addRow('Category:', applicant.category, 'category', false);
+  addRow('Name:', applicant.name, 'name', true, 'editable');
+  addRow('Nationality:', applicant.nationality, 'nationality', true, 'select', nationalities);
+  addRow('Education:', applicant.education, 'education', true, 'select', educationList);
+  addRow('Specialization:', applicant.specialization, 'specialization', true, 'editable');
+  addRow('Religion:', applicant.religion, 'religion', true, 'editable');
+  addRow('Age:', applicant.age, 'age', true, 'editable');
+  addRow('Available Time:', applicant.availableTime, 'availableTime', true, 'time');
+  addRow('Remarks:', applicant.remarks, 'remarks', true, 'editable');
+
+  container.appendChild(table);
+  return container;
+}
+
+function addNewApplicant() {
+  if(!selectedCategory || !selectedYear || !selectedMonth || !selectedDate) {
+    alert("Please select category, year, month, and date first.");
+    return;
+  }
+  const newApplicant = {
+    category: selectedCategory,
+    year: selectedYear,
+    month: selectedMonth,
+    date: selectedDate,
+    name: "",
+    nationality: nationalities[0],
+    education: educationList[0],
+    specialization: "",
+    religion: "",
+    age: "",
+    availableTime: "",
+    remarks: ""
+  };
+  if(!interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]) {
+    interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate] = [];
+  }
+  interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate].push(newApplicant);
+  renderProfiles();
+}
+
+function addDate() {
+  const dateInput = document.getElementById("dateInput");
+  const val = dateInput.value.trim();
+  if(!val.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    alert("Date must be in format YYYY-MM-DD");
+    return;
+  }
+  if(!interviewData[selectedCategory]) interviewData[selectedCategory] = {};
+  if(!interviewData[selectedCategory][selectedYear]) interviewData[selectedCategory][selectedYear] = {};
+  if(!interviewData[selectedCategory][selectedYear][selectedMonth]) interviewData[selectedCategory][selectedYear][selectedMonth] = {};
+  if(interviewData[selectedCategory][selectedYear][selectedMonth][val]) {
+    alert("Date already added.");
+    return;
+  }
+  interviewData[selectedCategory][selectedYear][selectedMonth][val] = [];
+  addDateTag(val);
+  dateInput.value = '';
+}
+
+function saveAll() {
+  if(!selectedCategory || !selectedYear || !selectedMonth || !selectedDate) {
+    alert("Please select category, year, month and date.");
+    return;
+  }
+  const applicants = interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate];
+  if(!applicants || applicants.length === 0) {
+    alert("No applicants to save.");
+    return;
+  }
+  Promise.all(applicants.map(applicant => saveApplicantToServer(applicant)))
+    .then(() => alert("All applicants saved successfully."))
+    .catch(() => alert("Error saving applicants."));
+}
+
+function clearAll() {
+  if(confirm("Clear all selections and reload?")) {
+    selectedCategory = selectedYear = selectedMonth = selectedDate = null;
+    interviewData = {};
+    loadFromServer();
+  }
+}
+
+categoryContainer.innerHTML = "";
+yearContainer.innerHTML = "";
+monthContainer.innerHTML = "";
+dateContainer.style.display = "none";
+
+addMoreBtn.onclick = addNewApplicant;
+document.getElementById("addDateBtn").onclick = addDate;
+document.getElementById("saveBtn").onclick = saveAll;
+clearBtn.onclick = clearAll;
+logoutBtn.onclick = () => {
+  localStorage.removeItem("token");
+  window.location.href = "admin.html";
 };
 
-logoutBtn.onclick = ()=>{
-  localStorage.removeItem('token');
-  window.location.href = 'admin.html';
-};
-
-// 🔹 INIT
 loadFromServer();
 </script>
 </body>
