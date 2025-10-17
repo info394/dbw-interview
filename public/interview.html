@@ -174,4 +174,163 @@ function renderYears() {
     btn.className='btn btn-year';
     btn.onclick=()=>{
       selectedYear=y;
-      monthContainer.style.display
+      monthContainer.style.display='block';
+      renderMonths();
+      updateBreadcrumb();
+    };
+    yearContainer.appendChild(btn);
+  });
+}
+function renderMonths() {
+  monthContainer.innerHTML='';
+  months.forEach(m=>{
+    const btn=document.createElement('button');
+    btn.textContent=m;
+    btn.className='btn btn-month';
+    btn.onclick=()=>{
+      selectedMonth=m;
+      dateContainer.style.display='block';
+      updateBreadcrumb();
+    };
+    monthContainer.appendChild(btn);
+  });
+}
+
+// 🔹 DATE INPUT
+function renderAddedDate() {
+  addedDatesDiv.innerHTML = '';
+  if (selectedDate) {
+    const dateBox = document.createElement('div');
+    dateBox.className = 'added-date';
+    dateBox.textContent = selectedDate;
+    const delSpan = document.createElement('span');
+    delSpan.textContent = '✕';
+    delSpan.onclick = () => {
+      selectedDate = null;
+      profilesWrapper.innerHTML = '';
+      addMoreBtn.style.display = 'none';
+      renderAddedDate();
+      updateBreadcrumb();
+    };
+    dateBox.appendChild(delSpan);
+    addedDatesDiv.appendChild(dateBox);
+  }
+}
+
+document.getElementById('addDateBtn').onclick = ()=>{
+  const dateVal = document.getElementById('dateInput').value.trim();
+  if(!dateVal){ alert('Enter a date (YYYY-MM-DD)'); return; }
+  selectedDate = dateVal;
+  addMoreBtn.style.display='block';
+  profilesWrapper.innerHTML='';
+  renderAddedDate();
+  updateBreadcrumb();
+};
+
+// 🔹 APPLICANT CARDS
+function createApplicantDiv(applicant){
+  const div = document.createElement('div');
+  div.className='profile-container';
+  div.innerHTML=`
+    <div class="profile-title">Applicant (${selectedDate || ''})</div>
+    <table class="profile-table">
+      <tr><td class="label">Name:</td><td><span class="editable" contenteditable="true">${applicant.name||''}</span></td></tr>
+      <tr><td class="label">Visa:</td><td><span class="editable" contenteditable="true">${applicant.visa||''}</span></td></tr>
+      <tr><td class="label">Nationality:</td><td><select class="nationality-select">${nationalities.map(n=>`<option ${applicant.nationality===n?'selected':''}>${n}</option>`)}</select></td></tr>
+      <tr><td class="label">Salary:</td><td><span class="editable" contenteditable="true">${applicant.salary||''}</span></td></tr>
+      <tr><td class="label">Education:</td><td><select class="education-select">${educationList.map(e=>`<option ${applicant.education===e?'selected':''}>${e}</option>`)}</select></td></tr>
+      <tr><td class="label">Contact:</td><td><span class="editable" contenteditable="true">${applicant.contact||''}</span></td></tr>
+      <tr><td class="label">Email:</td><td><span class="editable" contenteditable="true">${applicant.email||''}</span></td></tr>
+      <tr><td class="label">Time:</td><td><input type="time" class="time-input" value="${applicant.time||''}"></td></tr>
+      <tr><td class="label">Status:</td><td>
+        <select class="status-select">
+          <option ${applicant.status==='Accepted'?'selected':''}>Accepted</option>
+          <option ${applicant.status==='Rejected'?'selected':''}>Rejected</option>
+          <option ${applicant.status==='Did Not Show Up'?'selected':''}>Did Not Show Up</option>
+          <option ${!['Accepted','Rejected','Did Not Show Up'].includes(applicant.status)?'selected':''}>Pending</option>
+        </select>
+      </td></tr>
+    </table>
+    <div style="text-align:center;margin-top:6px;">
+      <button class="btn btn-month save-btn">Save</button>
+      <button class="btn btn-month remove-btn" style="background:#cc3300;">Remove</button>
+    </div>
+  `;
+  div.querySelector('.save-btn').onclick = async ()=>{
+    const editable=div.querySelectorAll('span.editable');
+    const updated={
+      id: applicant.id,
+      name: editable[0].textContent,
+      visa: editable[1].textContent,
+      nationality: div.querySelector('.nationality-select').value,
+      salary: editable[2].textContent,
+      education: div.querySelector('.education-select').value,
+      contact: editable[3].textContent,
+      email: editable[4].textContent,
+      time: div.querySelector('.time-input').value,
+      status: div.querySelector('.status-select').value,
+      category:selectedCategory,
+      year:selectedYear,
+      month:selectedMonth,
+      date:selectedDate
+    };
+    await saveApplicantToServer(updated);
+    alert('Applicant saved!');
+    loadFromServer();
+  };
+  div.querySelector('.remove-btn').onclick = async ()=>{
+    if(applicant.id) await deleteApplicantFromServer(applicant.id);
+    div.remove();
+  };
+  return div;
+}
+
+// 🔹 BUTTON EVENTS
+addMoreBtn.onclick = ()=>{
+  const newApp={category:selectedCategory, year:selectedYear, month:selectedMonth, date:selectedDate};
+  const div = createApplicantDiv(newApp);
+  profilesWrapper.appendChild(div);
+};
+
+document.getElementById('saveBtn').onclick = async ()=>{
+  const allDivs=profilesWrapper.querySelectorAll('.profile-container');
+  for(let div of allDivs){
+    const editable=div.querySelectorAll('span.editable');
+    const updated={
+      name: editable[0].textContent,
+      visa: editable[1].textContent,
+      nationality: div.querySelector('.nationality-select').value,
+      salary: editable[2].textContent,
+      education: div.querySelector('.education-select').value,
+      contact: editable[3].textContent,
+      email: editable[4].textContent,
+      time: div.querySelector('.time-input').value,
+      status: div.querySelector('.status-select').value,
+      category:selectedCategory, year:selectedYear, month:selectedMonth, date:selectedDate
+    };
+    await saveApplicantToServer(updated);
+  }
+  alert('All applicants saved!');
+  loadFromServer();
+};
+
+clearBtn.onclick = async ()=>{
+  if(confirm('Delete all applicants?')){
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    for(let a of data) await deleteApplicantFromServer(a.id);
+    profilesWrapper.innerHTML='';
+    alert('All cleared!');
+  }
+};
+
+logoutBtn.onclick = ()=>{
+  localStorage.removeItem('token');
+  window.location.href = 'admin.html';
+};
+
+// 🔹 INIT
+loadFromServer();
+</script>
+</body>
+</html>
