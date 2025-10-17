@@ -28,7 +28,7 @@
       font-weight: 500;
       color: #333;
     }
-    input {
+    input, select {
       width: 80%;
       padding: 10px;
       margin-bottom: 10px;
@@ -53,6 +53,38 @@
       margin-top: 10px;
       font-size: 14px;
     }
+    .date-section {
+      margin-top: 40px;
+    }
+    .date-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f0f4ff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px 15px;
+      width: 100%;
+      max-width: 400px;
+      margin: 10px auto;
+    }
+    .applicant-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      max-width: 400px;
+      margin: 10px auto;
+      padding: 10px;
+      font-weight: 500;
+    }
+    .delete-btn {
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -70,6 +102,15 @@
     <p id="errorMsg"></p>
   </div>
 
+  <!-- ✅ Date Input Section -->
+  <div class="date-section" id="dateSection" style="display: none;">
+    <h3>Add Interview Date</h3>
+    <input type="date" id="dateInput">
+    <button onclick="addDate()">Add Date</button>
+
+    <div id="datesContainer"></div>
+  </div>
+
   <script>
     const API_URL = '/api/login';
 
@@ -78,29 +119,7 @@
       const passwordInput = document.getElementById("password");
       const loginBtn = document.getElementById("loginBtn");
       const errorMsg = document.getElementById("errorMsg");
-
-      // 🚫 Removed auto-redirect to prevent flickering/twitching.
-      // ✅ Optional: Use this only if you implement token validation in your backend.
-      /*
-      const token = localStorage.getItem("token");
-      if (token) {
-        fetch('/api/validate-token', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        .then(res => {
-          if (res.ok) {
-            window.location.href = "interview.html";
-          } else {
-            localStorage.removeItem("token");
-          }
-        })
-        .catch(err => {
-          console.error("Token validation failed", err);
-        });
-      }
-      */
+      const dateSection = document.getElementById("dateSection");
 
       function clearError() {
         errorMsg.textContent = "";
@@ -132,7 +151,9 @@
 
           if (data.success) {
             localStorage.setItem("token", data.token);
-            window.location.href = "interview.html";
+            // Instead of redirecting, show date section
+            document.querySelector(".login-box").style.display = "none";
+            dateSection.style.display = "block";
           } else {
             errorMsg.textContent = "Invalid credentials.";
           }
@@ -147,13 +168,53 @@
       }
 
       loginBtn.addEventListener("click", login);
-
       [usernameInput, passwordInput].forEach(input => {
         input.addEventListener("keydown", (e) => {
           if (e.key === "Enter") login();
         });
       });
     });
+
+    // ✅ Function to add date and show applicant card
+    function addDate() {
+      const dateInput = document.getElementById("dateInput");
+      const dateValue = dateInput.value;
+
+      if (!dateValue) {
+        alert("Please select a date.");
+        return;
+      }
+
+      const datesContainer = document.getElementById("datesContainer");
+
+      // Create date button container
+      const dateDiv = document.createElement("div");
+      dateDiv.className = "date-button";
+
+      const dateLabel = document.createElement("span");
+      dateLabel.textContent = dateValue;
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-btn";
+      deleteBtn.textContent = "Delete";
+      deleteBtn.onclick = () => {
+        datesContainer.removeChild(dateDiv);
+        datesContainer.removeChild(applicantCard);
+      };
+
+      dateDiv.appendChild(dateLabel);
+      dateDiv.appendChild(deleteBtn);
+      datesContainer.appendChild(dateDiv);
+
+      // Create applicant card
+      const applicantCard = document.createElement("div");
+      applicantCard.className = "applicant-card";
+      applicantCard.textContent = `Applicant (${dateValue})`;
+
+      datesContainer.appendChild(applicantCard);
+
+      dateInput.value = ""; // Clear input
+    }
   </script>
 
 </body>
