@@ -60,17 +60,21 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(135deg, #dceeff, #f0f4ff);
+      background: linear-gradient(135deg, #f0faff, #d6edff);
       border: 1px solid #b0c4de;
       border-radius: 12px;
       padding: 12px 18px;
       width: 100%;
       max-width: 400px;
       margin: 10px auto;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-      font-weight: 500;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      font-weight: 600;
       color: #003366;
-      position: relative;
+      font-size: 15px;
+      transition: background 0.3s ease;
+    }
+    .date-button:hover {
+      background: linear-gradient(135deg, #e6f2ff, #cce0ff);
     }
     .applicant-card {
       background: white;
@@ -79,8 +83,8 @@
       max-width: 400px;
       margin: 5px auto 20px;
       padding: 10px 16px;
-      font-weight: 500;
-      font-size: 16px;
+      font-weight: 600;
+      font-size: 18px; /* increased by 2px */
       text-align: left;
       color: #222;
     }
@@ -88,12 +92,13 @@
       background: none;
       border: none;
       color: red;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      padding: 0;
+      padding: 0 5px;
       margin-left: 12px;
-      transition: color 0.2s;
+      line-height: 1;
+      transition: color 0.2s ease;
     }
     .delete-btn:hover {
       color: darkred;
@@ -121,7 +126,7 @@
     <input type="date" id="dateInput">
     <button onclick="addDate()">Add Date</button>
 
-    <div id="datesContainer"></div>
+    <div id="datesContainer" style="text-align: left;"></div>
   </div>
 
   <script>
