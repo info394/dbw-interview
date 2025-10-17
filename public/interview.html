@@ -480,6 +480,10 @@ function addNewApplicant() {
 function addDate() {
   const dateInput = document.getElementById("dateInput");
   const val = dateInput.value.trim();
+  if (!val) {
+    alert("Please enter a date.");
+    return;
+  }
   if(!interviewData[selectedCategory]) interviewData[selectedCategory] = {};
   if(!interviewData[selectedCategory][selectedYear]) interviewData[selectedCategory][selectedYear] = {};
   if(!interviewData[selectedCategory][selectedYear][selectedMonth]) interviewData[selectedCategory][selectedYear][selectedMonth] = {};
@@ -491,6 +495,7 @@ function addDate() {
   addDateTag(val);
   dateInput.value = '';
 }
+
 
 function saveAll() {
   if(!selectedCategory || !selectedYear || !selectedMonth || !selectedDate) {
@@ -533,5 +538,6 @@ loadFromServer();
 </script>
 </body>
 </html>
+
 
 
