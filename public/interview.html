@@ -48,7 +48,7 @@ select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; backg
 <div id="monthContainer" class="section"></div>
 <div id="dateContainer" class="section">
   <div class="date-input-container">
-    <input type="text" placeholder="Enter Date (YYYY-MM-DD)" id="dateInput" class="date-input">
+    <input type="text" placeholder="Enter Date" id="dateInput" class="date-input">
     <button id="addDateBtn" class="btn btn-month">Add Date</button>
   </div>
 </div>
@@ -162,8 +162,6 @@ function renderMonths(){
 // Date input
 document.getElementById('addDateBtn').onclick=()=>{
   const dateVal=document.getElementById('dateInput').value.trim();
-  if(!dateVal.match(/^\d{4}-\d{2}-\d{2}$/)){ alert('Use YYYY-MM-DD'); return; }
-  selectedDate=dateVal;
   addMoreBtn.style.display='block'; updateBreadcrumb(); profilesWrapper.innerHTML='';
   if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear]
      && interviewData[selectedCategory][selectedYear][selectedMonth]
@@ -250,5 +248,6 @@ loadFromServer();
 </script>
 </body>
 </html>
+
 
 
