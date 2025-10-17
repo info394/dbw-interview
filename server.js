@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ MySQL connection
+// MySQL connection
 const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -16,12 +16,12 @@ const db = mysql.createPool({
   database: 'interview_system'
 });
 
-// ✅ Dummy admin credentials
+// Dummy admin credentials (you can replace with DB login later)
 const ADMIN_USER = "admin";
 const ADMIN_PASS = "Petra@2025";
 
 // ✅ LOGIN ROUTE
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   if (username === ADMIN_USER && password === ADMIN_PASS) {
     res.json({ success: true, token: "admin-token" });
@@ -30,7 +30,7 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-// ✅ GET all applicants
+// ✅ GET ALL APPLICANTS
 app.get('/api/applicants', async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM applicants');
@@ -41,26 +41,19 @@ app.get('/api/applicants', async (req, res) => {
   }
 });
 
-// ✅ ADD or UPDATE applicant
+// ✅ ADD OR UPDATE APPLICANT
 app.post('/api/applicants', async (req, res) => {
   try {
     const a = req.body;
     if (a.id) {
-      // Update existing
       await db.query(
-        `UPDATE applicants SET name=?, visa=?, nationality=?, salary=?, education=?, 
-         contact=?, email=?, time=?, status=?, category=?, year=?, month=?, date=? WHERE id=?`,
-        [a.name, a.visa, a.nationality, a.salary, a.education,
-         a.contact, a.email, a.time, a.status, a.category, a.year, a.month, a.date, a.id]
+        'UPDATE applicants SET name=?, visa=?, nationality=?, salary=?, education=?, contact=?, email=?, time=?, status=?, category=?, year=?, month=?, date=? WHERE id=?',
+        [a.name, a.visa, a.nationality, a.salary, a.education, a.contact, a.email, a.time, a.status, a.category, a.year, a.month, a.date, a.id]
       );
     } else {
-      // Insert new
       const [result] = await db.query(
-        `INSERT INTO applicants 
-         (name, visa, nationality, salary, education, contact, email, time, status, category, year, month, date)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [a.name, a.visa, a.nationality, a.salary, a.education,
-         a.contact, a.email, a.time, a.status, a.category, a.year, a.month, a.date]
+        'INSERT INTO applicants (name, visa, nationality, salary, education, contact, email, time, status, category, year, month, date) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [a.name, a.visa, a.nationality, a.salary, a.education, a.contact, a.email, a.time, a.status, a.category, a.year, a.month, a.date]
       );
       a.id = result.insertId;
     }
@@ -72,7 +65,7 @@ app.post('/api/applicants', async (req, res) => {
   }
 });
 
-// ✅ DELETE applicant
+// ✅ DELETE APPLICANT
 app.delete('/api/applicants/:id', async (req, res) => {
   try {
     const id = req.params.id;
@@ -84,20 +77,19 @@ app.delete('/api/applicants/:id', async (req, res) => {
   }
 });
 
-// ✅ Serve Frontend
+// ✅ SERVE FRONTEND FILES (from /public)
 app.use(express.static(path.join(__dirname, 'public')));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+
+// Default route (for browser)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// ✅ Start Server
+// Fallback for unmatched routes (so it doesn’t show “Not Found”)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// ✅ START SERVER
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
-// Serve static frontend files
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Fallback route (for any unknown path)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
+app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
