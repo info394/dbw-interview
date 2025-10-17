@@ -10,9 +10,8 @@ app.use(express.json());
 
 // -----------------
 // 🔹 CLOUD MYSQL CONFIG
-// Replace with your Render or other cloud MySQL credentials
 const db = mysql.createPool({
-  host: process.env.DB_HOST,       // e.g., mydbhost.render.com
+  host: process.env.DB_HOST,       // your Render cloud DB host
   user: process.env.DB_USER,       // DB username
   password: process.env.DB_PASS,   // DB password
   database: process.env.DB_NAME,   // DB name
@@ -25,7 +24,7 @@ const ADMIN_PASS = "Petra@2025";
 
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
-  if(username === ADMIN_USER && password === ADMIN_PASS){
+  if (username === ADMIN_USER && password === ADMIN_PASS) {
     res.json({ success: true, token: "admin-token" });
   } else {
     res.json({ success: false });
@@ -38,7 +37,7 @@ app.get('/api/applicants', async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM applicants');
     res.json(rows);
-  } catch(err){
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Database error' });
   }
@@ -47,7 +46,7 @@ app.get('/api/applicants', async (req, res) => {
 app.post('/api/applicants', async (req, res) => {
   try {
     const a = req.body;
-    if(a.id){
+    if (a.id) {
       await db.query(
         `UPDATE applicants SET name=?, visa=?, nationality=?, salary=?, education=?, contact=?, email=?, time=?, status=?, category=?, year=?, month=?, date=? WHERE id=?`,
         [a.name, a.visa, a.nationality, a.salary, a.education, a.contact, a.email, a.time, a.status, a.category, a.year, a.month, a.date, a.id]
@@ -61,7 +60,7 @@ app.post('/api/applicants', async (req, res) => {
       a.id = result.insertId;
     }
     res.json({ success: true, id: a.id });
-  } catch(err){
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Database error' });
   }
@@ -72,7 +71,7 @@ app.delete('/api/applicants/:id', async (req, res) => {
     const id = req.params.id;
     await db.query('DELETE FROM applicants WHERE id=?', [id]);
     res.json({ success: true });
-  } catch(err){
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Database error' });
   }
@@ -82,9 +81,19 @@ app.delete('/api/applicants/:id', async (req, res) => {
 // 🔹 SERVE FRONTEND
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Fallback for SPA (optional)
-app.get('*', (req, res) => {
+// Serve admin.html for login
+app.get('/admin.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+// Serve interview.html after login
+app.get('/interview.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'interview.html'));
+});
+
+// Fallback for any other routes
+app.get('*', (req, res) => {
+  res.redirect('/admin.html');
 });
 
 // -----------------
