@@ -89,41 +89,20 @@
     }
 
     .added-date {
-  display: inline-flex;
-  align-items: center;
-  background: #66ccff;
-  color: #004a99;
-  padding: 10px 16px;
-  margin: 4px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  user-select: none;
-  border: none;
-  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-}
+      display: inline-block;
+      background: #66ccff;
+      color: #004a99;
+      padding: 4px 8px;
+      margin: 4px;
+      border-radius: 6px;
+      cursor: default;
+    }
 
-.added-date:hover {
-  background: #004a99;
-  color: white;
-  box-shadow: 0 4px 12px rgba(0, 74, 153, 0.3);
-  transform: scale(1.05);
-}
-
-.added-date .date-text {
-  font-weight: 700;
-  margin-right: 8px;
-}
-
-.added-date .remove-cross {
-  font-weight: 700;
-  font-size: 12px;
-  color: red;
-  cursor: pointer;
-  user-select: none;
-}
-
+    .added-date span {
+      margin-left: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
     .profiles-wrapper {
       display: flex;
@@ -244,7 +223,7 @@
 
   <div id="dateContainer" class="section">
     <div class="date-input-container">
-      <input type="text" placeholder="Enter Date:" id="dateInput" class="date-input">
+      <input type="text" placeholder="Enter Date (YYYY-MM-DD)" id="dateInput" class="date-input">
       <button id="addDateBtn" class="btn btn-month">Add Date</button>
     </div>
     <div id="addedDates" style="margin-top:10px;"></div>
