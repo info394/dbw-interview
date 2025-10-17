@@ -87,9 +87,17 @@ app.delete('/api/applicants/:id', async (req, res) => {
 // ✅ Serve Frontend
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
 // ✅ Start Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Fallback route (for any unknown path)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
