@@ -75,3 +75,4 @@ app.get('/', (req, res) => {
   res.send('✅ Backend is running successfully!');
 });
 
+const API_URL = 'https://dbw-interview.onrender.com/api/applicants';
