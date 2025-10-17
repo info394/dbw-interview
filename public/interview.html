@@ -10,32 +10,30 @@ h1 { color: #004a99; margin-bottom: 10px; }
 h2.subheading, h3.subheading { color: #004a99; font-weight: 400; margin: 5px 0; font-size: 18px; }
 h3.subheading { padding-bottom: 30px; }
 #breadcrumb { margin: 10px 0; font-size:14px; color:#004a99; }
-.btn { padding: 10px 16px; margin: 5px; font-size: 14px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: 0.3s; position: relative; }
-.btn:hover { transform: scale(1.05); opacity: 0.9; }
+.btn { padding: 14px 22px; margin: 5px; font-size: 16px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: 0.3s; }
 .btn-category { background: #004a99; color: white; }
 .btn-year, .btn-month { background: #0066cc; color: white; }
 .btn-date { background: #66ccff; color: white; }
 .btn-active { background: white !important; color: #004a99 !important; border: 1px solid #004a99; }
+.btn:hover { opacity: 0.8; }
 .section { margin-top: 20px; display: none; }
 .date-input-container { margin-top: 20px; }
 .date-input { padding: 6px; width: 150px; font-size: 14px; margin-right: 6px; }
 .profiles-wrapper { display: flex; flex-wrap: wrap; justify-content: flex-start; margin-top: 20px; }
 .profile-container { background: #ffffff; border-radius: 8px; padding: 12px; margin: 5px; width: 300px; text-align: left; font-size: 12px; box-shadow: 2px 2px 8px #cbd8e6, -2px -2px 8px #f7faff; position: relative; }
-.profile-label { font-weight: 600; color: #004a99; margin-bottom: 6px; }
+.profile-label { font-weight: 600; color: #004a99; margin-bottom: 8px; font-size: 14px; }
 .profile-table { width: 100%; border-collapse: collapse; }
 .profile-table td { padding: 4px 6px; }
 .label { width: 40%; font-weight: 500; color: #004a99; text-align: left; }
-.editable { background-color: #f7faff; border-radius: 4px; padding: 4px 6px; width: 95%; border: 1px solid transparent; display:inline-block; }
+.editable { background-color: #f7faff; border-radius: 4px; padding: 4px 6px; width:95%; border: 1px solid transparent; display:inline-block; }
 .editable:focus { border: 1px solid #ff944d; outline: none; background-color: #fffefc; }
 select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; background:rgb(0, 153, 255); color:white; width:100%; }
 .time-input { background:yellow; width:95%; padding:4px; border-radius:4px; border:none; color:black; }
+.notes-input { width:95%; border-radius:4px; padding:4px; border:1px solid #ccc; resize:vertical; min-height:40px; }
 #addMoreBtn { margin-top: 10px; }
 #saveBtn, #clearBtn { margin-top: 20px; padding: 10px 20px; font-size: 14px; cursor: pointer; border-radius: 8px; border:none; color:white; }
 #saveBtn { background:#004a99; }
 #clearBtn { background:#cc3300; margin-left: 10px; }
-
-.date-button-container { display:inline-block; position: relative; margin:4px; }
-.delete-date { position:absolute; top:-6px; right:-6px; background:red; color:white; border-radius:50%; width:18px; height:18px; line-height:16px; font-size:12px; cursor:pointer; font-weight:bold; }
 </style>
 </head>
 <body>
@@ -45,7 +43,6 @@ select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; backg
 <h3 class="subheading">Manage and Review Applicant Details</h3>
 
 <div id="breadcrumb"></div>
-
 <div id="categoryContainer"></div>
 <div id="yearContainer" class="section"></div>
 <div id="monthContainer" class="section"></div>
@@ -56,86 +53,128 @@ select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; backg
   </div>
 </div>
 
-<div id="datesWrapper" style="margin-top:10px;"></div>
-
 <div id="profilesWrapper" class="profiles-wrapper"></div>
 <button id="addMoreBtn" class="btn btn-month" style="display:none;">Add One More</button>
 <button id="saveBtn">Save All</button>
 <button id="clearBtn">Clear All</button>
 
 <script>
-const categories = ["PETRA","KEDMA","Logistics Manager","Logistics Assistant","Carpenter","Operations Supervisor","Electrician"];
-const years = ["2025", "2026"];
-const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const nationalities = ["Algerian","Bhutanese","Cambodia","Cameroonian","Chad","Colombian","Congo","Ethiopian","Filipina","Gabonese","Ghana","Guinean","Indian","Indonesian","Ivorian","Kenyan","Myanmar","Nepalese","Nigerian","South African","Sierra Leone","Sri Lankan","Tanzanian","Ugandan","Zimbabwe"];
-const educationList = ["Master's","Bachelor's","Bachelor's Diploma","High School","College Diploma","College","College Undergraduate","High School Diploma","Diploma","Certificate","University"];
+// Backend URL
+const API_URL = 'https://dbw-interview.onrender.com/api/applicants';
+
+// Options
+const categories=["PETRA","KEDMA","Logistics Manager","Logistics Assistant","Carpenter","Operations Supervisor","Electrician"];
+const years=["2025","2026"];
+const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const nationalities=["Algerian","Bhutanese","Cambodia","Cameroonian","Chad","Colombian","Congo","Ethiopian","Filipina","Gabonese","Ghana","Guinean","Indian","Indonesian","Ivorian","Kenyan","Myanmar","Nepalese","Nigerian","South African","Sierra Leone","Sri Lankan","Tanzanian","Ugandan","Zimbabwe"];
+const educationList=["Master's","Bachelor's","Bachelor's Diploma","High School","College Diploma","College","College Undergraduate","High School Diploma","Diploma","Certificate","University"];
 
 let interviewData = {};
-let selectedCategory, selectedYear, selectedMonth, selectedDate;
+const categoryContainer=document.getElementById("categoryContainer");
+const yearContainer=document.getElementById("yearContainer");
+const monthContainer=document.getElementById("monthContainer");
+const dateContainer=document.getElementById("dateContainer");
+const profilesWrapper=document.getElementById("profilesWrapper");
+const breadcrumbDiv=document.getElementById("breadcrumb");
+const addMoreBtn=document.getElementById("addMoreBtn");
+const clearBtn=document.getElementById("clearBtn");
 
-const categoryContainer = document.getElementById("categoryContainer");
-const yearContainer = document.getElementById("yearContainer");
-const monthContainer = document.getElementById("monthContainer");
-const dateContainer = document.getElementById("dateContainer");
-const datesWrapper = document.getElementById("datesWrapper");
-const profilesWrapper = document.getElementById("profilesWrapper");
-const breadcrumbDiv = document.getElementById("breadcrumb");
-const addMoreBtn = document.getElementById("addMoreBtn");
+let selectedCategory=null, selectedYear=null, selectedMonth=null, selectedDate=null;
 
-// ----------- RENDER -------------
-function updateBreadcrumb(){
-  breadcrumbDiv.textContent = [selectedCategory, selectedYear, selectedMonth, selectedDate].filter(Boolean).join(' > ');
+// Load data
+async function loadFromServer(){
+  try{
+    const res=await fetch(API_URL);
+    const data=await res.json();
+    interviewData={};
+    data.forEach(item=>{
+      if(!interviewData[item.category]) interviewData[item.category]={};
+      if(!interviewData[item.category][item.year]) interviewData[item.category][item.year]={};
+      if(!interviewData[item.category][item.year][item.month]) interviewData[item.category][item.year][item.month]={};
+      if(!interviewData[item.category][item.year][item.month][item.date]) interviewData[item.category][item.year][item.month][item.date]=[];
+      interviewData[item.category][item.year][item.month][item.date].push(item);
+    });
+    renderCategories();
+  }catch(err){ console.error(err); renderCategories(); }
 }
 
+// Breadcrumb
+function updateBreadcrumb(){
+  const crumbs=[];
+  if(selectedCategory) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('category')">${selectedCategory}</span>`);
+  if(selectedYear) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('year')">${selectedYear}</span>`);
+  if(selectedMonth) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('month')">${selectedMonth}</span>`);
+  if(selectedDate) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('date')">${selectedDate}</span>`);
+  breadcrumbDiv.innerHTML=crumbs.join(" > ");
+}
+
+function goBack(level){
+  if(level==='category'){ selectedCategory=selectedYear=selectedMonth=selectedDate=null; }
+  else if(level==='year'){ selectedYear=selectedMonth=selectedDate=null; }
+  else if(level==='month'){ selectedMonth=selectedDate=null; }
+  else if(level==='date'){ selectedDate=null; }
+  profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
+  yearContainer.style.display=monthContainer.style.display=dateContainer.style.display='none';
+  renderCategories();
+  if(selectedCategory) renderYears();
+  if(selectedYear) renderMonths();
+  updateBreadcrumb();
+}
+
+// Render buttons
 function renderCategories(){
-  categoryContainer.innerHTML = '';
+  categoryContainer.innerHTML='';
   categories.forEach(c=>{
-    const btn=document.createElement('button'); btn.textContent=c; btn.className='btn btn-category';
+    const btn=document.createElement('button');
+    btn.textContent=c;
+    btn.className='btn btn-category';
     btn.onclick=()=>{ selectedCategory=c; yearContainer.style.display='block'; renderYears(); updateBreadcrumb(); };
     categoryContainer.appendChild(btn);
   });
-  yearContainer.style.display = monthContainer.style.display = dateContainer.style.display = 'none';
+  yearContainer.style.display=monthContainer.style.display=dateContainer.style.display='none';
+  profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
 }
 
 function renderYears(){
   yearContainer.innerHTML='';
   years.forEach(y=>{
-    const btn=document.createElement('button'); btn.textContent=y; btn.className='btn btn-year';
+    const btn=document.createElement('button');
+    btn.textContent=y;
+    btn.className='btn btn-year';
     btn.onclick=()=>{ selectedYear=y; monthContainer.style.display='block'; renderMonths(); updateBreadcrumb(); };
     yearContainer.appendChild(btn);
   });
-  monthContainer.style.display = dateContainer.style.display = 'none';
+  monthContainer.style.display=dateContainer.style.display='none';
+  profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
 }
 
 function renderMonths(){
   monthContainer.innerHTML='';
   months.forEach(m=>{
-    const btn=document.createElement('button'); btn.textContent=m; btn.className='btn btn-month';
-    btn.onclick=()=>{ selectedMonth=m; dateContainer.style.display='block'; updateBreadcrumb(); };
+    const btn=document.createElement('button');
+    btn.textContent=m;
+    btn.className='btn btn-month';
+    btn.onclick=()=>{ selectedMonth=m; dateContainer.style.display='block'; updateBreadcrumb(); profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; };
     monthContainer.appendChild(btn);
   });
 }
 
-// ----------- DATE BUTTONS -------------
-document.getElementById('addDateBtn').onclick = ()=>{
-  const val=document.getElementById('dateInput').value.trim();
-  if(!val) return;
-  selectedDate=val; updateBreadcrumb(); profilesWrapper.innerHTML=''; addMoreBtn.style.display='block';
-
-  const container=document.createElement('div'); container.className='date-button-container';
-  const btn=document.createElement('button'); btn.className='btn btn-date'; btn.textContent=val;
-  btn.onclick=()=>{ selectedDate=val; updateBreadcrumb(); };
-  container.appendChild(btn);
-
-  const del=document.createElement('div'); del.className='delete-date'; del.textContent='×';
-  del.onclick=()=>{ container.remove(); if(selectedDate===val){ profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; } };
-  container.appendChild(del);
-
-  datesWrapper.appendChild(container);
-  document.getElementById('dateInput').value='';
+// Date input
+document.getElementById('addDateBtn').onclick=()=>{
+  const dateVal=document.getElementById('dateInput').value.trim();
+  if(!dateVal.match(/^\d{4}-\d{2}-\d{2}$/)){ alert('Use YYYY-MM-DD'); return; }
+  selectedDate=dateVal;
+  addMoreBtn.style.display='block'; updateBreadcrumb(); profilesWrapper.innerHTML='';
+  if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear]
+     && interviewData[selectedCategory][selectedYear][selectedMonth]
+     && interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]){
+       interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate].forEach(a=>{
+         profilesWrapper.appendChild(createApplicantDiv(a));
+       });
+  }
 };
 
-// ----------- APPLICANT CARDS -------------
+// Applicant card
 function createApplicantDiv(app){
   const div=document.createElement('div'); div.className='profile-container';
   const label=document.createElement('div'); label.className='profile-label'; label.textContent='Applicant';
@@ -158,27 +197,56 @@ function createApplicantDiv(app){
         <option ${app.status==='Hold'?'selected':''}>Hold</option>
       </select>
     </td></tr>
-    <tr><td class="label">Notes:</td><td><textarea class="notes-input" style="width:95%; border-radius:4px; padding:4px;">${app.notes||''}</textarea></td></tr>
+    <tr><td class="label">Notes:</td><td><textarea class="notes-input">${app.notes||''}</textarea></td></tr>
   `;
   div.appendChild(table);
+  div.dataset.id = app._id || null;
   return div;
 }
 
-// ----------- ADD NEW APPLICANT -------------
-addMoreBtn.onclick = ()=>{
-  if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate){ alert('Select Category, Year, Month and Date first.'); return; }
-  const app={category:selectedCategory,year:selectedYear,month:selectedMonth,date:selectedDate,name:'',visa:'',nationality:nationalities[0],salary:'',education:educationList[0],contact:'',email:'',time:'',status:'Accepted'};
-  profilesWrapper.appendChild(createApplicantDiv(app));
-  addMoreBtn.style.display='block';
+// Add new applicant
+addMoreBtn.onclick=()=>{
+  if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate){ alert('Select Category, Year, Month, Date'); return; }
+  const newApp={category:selectedCategory, year:selectedYear, month:selectedMonth, date:selectedDate, name:'', visa:'', nationality:nationalities[0], salary:'', education:educationList[0], contact:'', email:'', time:'', status:'Accepted', notes:''};
+  profilesWrapper.appendChild(createApplicantDiv(newApp));
 };
 
-  const notes = profile.querySelector('textarea.notes-input').value;
+// Save all
+document.getElementById('saveBtn').onclick=async()=>{
+  const profiles=profilesWrapper.querySelectorAll('.profile-container');
+  for(let p of profiles){
+    const a={_id:p.dataset.id, category:selectedCategory, year:selectedYear, month:selectedMonth, date:selectedDate};
+    const editables=p.querySelectorAll('span.editable');
+    a.name=editables[0].textContent.trim();
+    a.visa=editables[1].textContent.trim();
+    a.nationality=p.querySelector('select.nationality-select').value;
+    a.salary=editables[2].textContent.trim();
+    a.education=p.querySelector('select.education-select').value;
+    a.contact=editables[3].textContent.trim();
+    a.email=editables[4].textContent.trim();
+    a.time=p.querySelector('input.time-input').value;
+    a.status=p.querySelector('select.status-select').value;
+    a.notes=p.querySelector('textarea.notes-input').value;
+    await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(a)});
+  }
+  alert('All profiles saved'); await loadFromServer();
+};
 
+// Clear all
+clearBtn.onclick=async()=>{
+  if(!confirm('Delete all applicants for this date?')) return;
+  if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate){ alert('Select Category, Year, Month, Date'); return; }
+  if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear] && interviewData[selectedCategory][selectedYear][selectedMonth] && interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]){
+    const arr=interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate];
+    for(let a of arr) if(a._id) await fetch(`${API_URL}/${a._id}`,{method:'DELETE'});
+    interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]=[];
+    profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
+  }
+  alert('Cleared all applicants'); await loadFromServer();
+};
 
-// ----------- INITIAL -------------
-renderCategories();
+// Initial load
+loadFromServer();
 </script>
-
 </body>
 </html>
-
