@@ -10,17 +10,18 @@ h1 { color: #004a99; margin-bottom: 10px; }
 h2.subheading, h3.subheading { color: #004a99; font-weight: 400; margin: 5px 0; font-size: 18px; }
 h3.subheading { padding-bottom: 30px; }
 #breadcrumb { margin: 10px 0; font-size:14px; color:#004a99; }
-.btn { padding: 14px 22px; margin: 5px; font-size: 16px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: 0.3s; position: relative; }
+.btn { padding: 10px 16px; margin: 5px; font-size: 14px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: 0.3s; position: relative; }
+.btn:hover { transform: scale(1.05); opacity: 0.9; }
 .btn-category { background: #004a99; color: white; }
 .btn-year, .btn-month { background: #0066cc; color: white; }
 .btn-date { background: #66ccff; color: white; }
 .btn-active { background: white !important; color: #004a99 !important; border: 1px solid #004a99; }
-.btn:hover { opacity: 0.8; transform: scale(1.03); transition: 0.3s; }
 .section { margin-top: 20px; display: none; }
 .date-input-container { margin-top: 20px; }
 .date-input { padding: 6px; width: 150px; font-size: 14px; margin-right: 6px; }
 .profiles-wrapper { display: flex; flex-wrap: wrap; justify-content: flex-start; margin-top: 20px; }
 .profile-container { background: #ffffff; border-radius: 8px; padding: 12px; margin: 5px; width: 300px; text-align: left; font-size: 12px; box-shadow: 2px 2px 8px #cbd8e6, -2px -2px 8px #f7faff; position: relative; }
+.profile-label { font-weight: 600; color: #004a99; margin-bottom: 6px; }
 .profile-table { width: 100%; border-collapse: collapse; }
 .profile-table td { padding: 4px 6px; }
 .label { width: 40%; font-weight: 500; color: #004a99; text-align: left; }
@@ -55,7 +56,7 @@ select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; backg
   </div>
 </div>
 
-<div id="datesWrapper" class="section"></div>
+<div id="datesWrapper" style="margin-top:10px;"></div>
 
 <div id="profilesWrapper" class="profiles-wrapper"></div>
 <button id="addMoreBtn" class="btn btn-month" style="display:none;">Add One More</button>
@@ -63,8 +64,6 @@ select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; backg
 <button id="clearBtn">Clear All</button>
 
 <script>
-const API_URL = 'https://dbw-interview.onrender.com/api/applicants';
-
 const categories = ["PETRA","KEDMA","Logistics Manager","Logistics Assistant","Carpenter","Operations Supervisor","Electrician"];
 const years = ["2025", "2026"];
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -72,72 +71,33 @@ const nationalities = ["Algerian","Bhutanese","Cambodia","Cameroonian","Chad","C
 const educationList = ["Master's","Bachelor's","Bachelor's Diploma","High School","College Diploma","College","College Undergraduate","High School Diploma","Diploma","Certificate","University"];
 
 let interviewData = {};
+let selectedCategory, selectedYear, selectedMonth, selectedDate;
 
 const categoryContainer = document.getElementById("categoryContainer");
 const yearContainer = document.getElementById("yearContainer");
 const monthContainer = document.getElementById("monthContainer");
 const dateContainer = document.getElementById("dateContainer");
+const datesWrapper = document.getElementById("datesWrapper");
 const profilesWrapper = document.getElementById("profilesWrapper");
 const breadcrumbDiv = document.getElementById("breadcrumb");
-const datesWrapper = document.getElementById("datesWrapper");
 const addMoreBtn = document.getElementById("addMoreBtn");
-const clearBtn = document.getElementById("clearBtn");
 
-let selectedCategory = null, selectedYear = null, selectedMonth = null, selectedDate = null;
-
-// ------------------ API ------------------
-async function loadFromServer() {
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    interviewData = {};
-    data.forEach(item => {
-      if(!interviewData[item.category]) interviewData[item.category]={};
-      if(!interviewData[item.category][item.year]) interviewData[item.category][item.year]={};
-      if(!interviewData[item.category][item.year][item.month]) interviewData[item.category][item.year][item.month]={};
-      if(!interviewData[item.category][item.year][item.month][item.date]) interviewData[item.category][item.year][item.month][item.date]=[];
-      interviewData[item.category][item.year][item.month][item.date].push(item);
-    });
-    renderCategories();
-  } catch(err) {
-    console.error(err);
-    renderCategories();
-  }
+// ----------- RENDER -------------
+function updateBreadcrumb(){
+  breadcrumbDiv.textContent = [selectedCategory, selectedYear, selectedMonth, selectedDate].filter(Boolean).join(' > ');
 }
 
-async function saveApplicantToServer(applicant) {
-  await fetch(API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(applicant) });
-}
-async function deleteApplicantFromServer(id) {
-  await fetch(`${API_URL}/${id}`, { method:'DELETE' });
-}
-
-// ------------------ RENDER ------------------
-function updateBreadcrumb() {
-  const crumbs = [];
-  if(selectedCategory) crumbs.push(selectedCategory);
-  if(selectedYear) crumbs.push(selectedYear);
-  if(selectedMonth) crumbs.push(selectedMonth);
-  if(selectedDate) crumbs.push(selectedDate);
-  breadcrumbDiv.textContent = crumbs.join(' > ');
-}
-
-function renderCategories() {
+function renderCategories(){
   categoryContainer.innerHTML = '';
   categories.forEach(c=>{
-    const btn = document.createElement('button');
-    btn.textContent = c;
-    btn.className='btn btn-category';
-    btn.onclick = ()=>{
-      selectedCategory=c; yearContainer.style.display='block'; renderYears(); updateBreadcrumb();
-    };
+    const btn=document.createElement('button'); btn.textContent=c; btn.className='btn btn-category';
+    btn.onclick=()=>{ selectedCategory=c; yearContainer.style.display='block'; renderYears(); updateBreadcrumb(); };
     categoryContainer.appendChild(btn);
   });
   yearContainer.style.display = monthContainer.style.display = dateContainer.style.display = 'none';
-  profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
 }
 
-function renderYears() {
+function renderYears(){
   yearContainer.innerHTML='';
   years.forEach(y=>{
     const btn=document.createElement('button'); btn.textContent=y; btn.className='btn btn-year';
@@ -145,124 +105,75 @@ function renderYears() {
     yearContainer.appendChild(btn);
   });
   monthContainer.style.display = dateContainer.style.display = 'none';
-  profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
 }
 
-function renderMonths() {
+function renderMonths(){
   monthContainer.innerHTML='';
   months.forEach(m=>{
     const btn=document.createElement('button'); btn.textContent=m; btn.className='btn btn-month';
-    btn.onclick=()=>{ selectedMonth=m; dateContainer.style.display='block'; updateBreadcrumb(); profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; };
+    btn.onclick=()=>{ selectedMonth=m; dateContainer.style.display='block'; updateBreadcrumb(); };
     monthContainer.appendChild(btn);
   });
 }
 
-// ------------------ DATE BUTTONS ------------------
-document.getElementById('addDateBtn').onclick = () => {
-  const dateVal = document.getElementById('dateInput').value.trim();
-  if(!dateVal) return;
-  selectedDate = dateVal;
-  updateBreadcrumb(); profilesWrapper.innerHTML=''; addMoreBtn.style.display='block';
+// ----------- DATE BUTTONS -------------
+document.getElementById('addDateBtn').onclick = ()=>{
+  const val=document.getElementById('dateInput').value.trim();
+  if(!val) return;
+  selectedDate=val; updateBreadcrumb(); profilesWrapper.innerHTML=''; addMoreBtn.style.display='block';
 
-  const container = document.createElement('div'); container.className='date-button-container';
-  const dateBtn = document.createElement('button'); dateBtn.textContent=dateVal; dateBtn.className='btn btn-date';
-  dateBtn.onclick=()=>{ selectedDate=dateVal; updateBreadcrumb(); renderProfiles(); };
-  container.appendChild(dateBtn);
+  const container=document.createElement('div'); container.className='date-button-container';
+  const btn=document.createElement('button'); btn.className='btn btn-date'; btn.textContent=val;
+  btn.onclick=()=>{ selectedDate=val; updateBreadcrumb(); };
+  container.appendChild(btn);
 
-  const delBtn = document.createElement('div'); delBtn.textContent='×'; delBtn.className='delete-date';
-  delBtn.onclick=()=>{ container.remove(); if(selectedDate===dateVal){ profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; } };
-  container.appendChild(delBtn);
+  const del=document.createElement('div'); del.className='delete-date'; del.textContent='×';
+  del.onclick=()=>{ container.remove(); if(selectedDate===val){ profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; } };
+  container.appendChild(del);
 
   datesWrapper.appendChild(container);
-
   document.getElementById('dateInput').value='';
 };
 
-// ------------------ APPLICANT CARDS ------------------
-function createApplicantDiv(applicant){
-  const div = document.createElement('div'); div.className='profile-container';
-  const label = document.createElement('div'); label.textContent='Applicant'; label.style.fontWeight='600'; label.style.color='#004a99'; label.style.marginBottom='8px';
+// ----------- APPLICANT CARDS -------------
+function createApplicantDiv(app){
+  const div=document.createElement('div'); div.className='profile-container';
+  const label=document.createElement('div'); label.className='profile-label'; label.textContent='Applicant';
   div.appendChild(label);
 
-  const table = document.createElement('table'); table.className='profile-table';
+  const table=document.createElement('table'); table.className='profile-table';
   table.innerHTML=`
-      <tr><td class="label">Name:</td><td><span class="editable" contenteditable="true">${applicant.name||''}</span></td></tr>
-      <tr><td class="label">Visa:</td><td><span class="editable" contenteditable="true">${applicant.visa||''}</span></td></tr>
-      <tr><td class="label">Nationality:</td><td><select class="nationality-select">${nationalities.map(n=>`<option ${applicant.nationality===n?'selected':''}>${n}</option>`).join('')}</select></td></tr>
-      <tr><td class="label">Salary:</td><td><span class="editable" contenteditable="true">${applicant.salary||''}</span></td></tr>
-      <tr><td class="label">Education:</td><td><select class="education-select">${educationList.map(e=>`<option ${applicant.education===e?'selected':''}>${e}</option>`).join('')}</select></td></tr>
-      <tr><td class="label">Contact:</td><td><span class="editable" contenteditable="true">${applicant.contact||''}</span></td></tr>
-      <tr><td class="label">Email:</td><td><span class="editable" contenteditable="true">${applicant.email||''}</span></td></tr>
-      <tr><td class="label">Time:</td><td><input type="time" class="time-input" value="${applicant.time||''}"></td></tr>
-      <tr><td class="label">Status:</td><td>
-        <select class="status-select">
-          <option ${applicant.status==='Accepted'?'selected':''}>Accepted</option>
-          <option ${applicant.status==='Rejected'?'selected':''}>Rejected</option>
-          <option ${applicant.status==='Hold'?'selected':''}>Hold</option>
-        </select>
-      </td></tr>
+    <tr><td class="label">Name:</td><td><span class="editable" contenteditable="true">${app.name||''}</span></td></tr>
+    <tr><td class="label">Visa:</td><td><span class="editable" contenteditable="true">${app.visa||''}</span></td></tr>
+    <tr><td class="label">Nationality:</td><td><select class="nationality-select">${nationalities.map(n=>`<option ${app.nationality===n?'selected':''}>${n}</option>`).join('')}</select></td></tr>
+    <tr><td class="label">Salary:</td><td><span class="editable" contenteditable="true">${app.salary||''}</span></td></tr>
+    <tr><td class="label">Education:</td><td><select class="education-select">${educationList.map(e=>`<option ${app.education===e?'selected':''}>${e}</option>`).join('')}</select></td></tr>
+    <tr><td class="label">Contact:</td><td><span class="editable" contenteditable="true">${app.contact||''}</span></td></tr>
+    <tr><td class="label">Email:</td><td><span class="editable" contenteditable="true">${app.email||''}</span></td></tr>
+    <tr><td class="label">Time:</td><td><input type="time" class="time-input" value="${app.time||''}"></td></tr>
+    <tr><td class="label">Status:</td><td>
+      <select class="status-select">
+        <option ${app.status==='Accepted'?'selected':''}>Accepted</option>
+        <option ${app.status==='Rejected'?'selected':''}>Rejected</option>
+        <option ${app.status==='Hold'?'selected':''}>Hold</option>
+      </select>
+    </td></tr>
   `;
-  div.appendChild(table); div.dataset.id=applicant._id||null;
+  div.appendChild(table);
   return div;
 }
 
-// ------------------ ADD NEW APPLICANT ------------------
+// ----------- ADD NEW APPLICANT -------------
 addMoreBtn.onclick = ()=>{
   if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate){ alert('Select Category, Year, Month and Date first.'); return; }
-  const newApplicant={category:selectedCategory,year:selectedYear,month:selectedMonth,date:selectedDate,name:'',visa:'',nationality:nationalities[0],salary:'',education:educationList[0],contact:'',email:'',time:'',status:'Accepted'};
-  const div=createApplicantDiv(newApplicant); profilesWrapper.appendChild(div); addMoreBtn.style.display='block';
-};
-
-// ------------------ SAVE ALL ------------------
-document.getElementById('saveBtn').onclick = async ()=>{
-  const profiles = profilesWrapper.querySelectorAll('.profile-container');
-  for(let profile of profiles){
-    const applicant={}; applicant._id=profile.dataset.id;
-    applicant.category=selectedCategory; applicant.year=selectedYear; applicant.month=selectedMonth; applicant.date=selectedDate;
-
-    const editable = profile.querySelectorAll('td .editable');
-    applicant.name = editable[0].textContent.trim();
-    applicant.visa = editable[1].textContent.trim();
-    applicant.nationality = profile.querySelector('select.nationality-select').value;
-    applicant.salary = editable[2].textContent.trim();
-    applicant.education = profile.querySelector('select.education-select').value;
-    applicant.contact = editable[3].textContent.trim();
-    applicant.email = editable[4].textContent.trim();
-    applicant.time = profile.querySelector('input.time-input').value;
-    applicant.status = profile.querySelector('select.status-select').value;
-
-    await saveApplicantToServer(applicant);
-  }
-  alert('All profiles saved successfully.'); await loadFromServer();
-};
-
-// ------------------ CLEAR ------------------
-clearBtn.onclick = async ()=>{
-  if(!confirm('Delete all applicants for this date?')) return;
-  if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate){ alert('Select Category, Year, Month and Date first.'); return; }
-  if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear] && interviewData[selectedCategory][selectedYear][selectedMonth] && interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]){
-    const arr = interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate];
-    for(let a of arr){ if(a._id) await deleteApplicantFromServer(a._id); }
-    interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]=[];
-    profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
-  }
-  alert('All applicants cleared for this date.'); await loadFromServer();
-};
-
-// ------------------ RENDER PROFILES ------------------
-function renderProfiles(){
-  profilesWrapper.innerHTML='';
-  if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate) return;
-  if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear] && interviewData[selectedCategory][selectedYear][selectedMonth] && interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]){
-    interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate].forEach(a=>{
-      profilesWrapper.appendChild(createApplicantDiv(a));
-    });
-  }
+  const app={category:selectedCategory,year:selectedYear,month:selectedMonth,date:selectedDate,name:'',visa:'',nationality:nationalities[0],salary:'',education:educationList[0],contact:'',email:'',time:'',status:'Accepted'};
+  profilesWrapper.appendChild(createApplicantDiv(app));
   addMoreBtn.style.display='block';
-}
+};
 
-// ------------------ INITIAL ------------------
-loadFromServer();
+// ----------- INITIAL -------------
+renderCategories();
 </script>
+
 </body>
 </html>
