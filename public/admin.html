@@ -53,61 +53,63 @@ button:hover { opacity: 0.85; }
 <script>
 const API_URL = '/api/login';
 
-// Redirect if already logged in
-if (localStorage.getItem("token")) {
-  window.location.href = "interview.html";
-}
+window.addEventListener("DOMContentLoaded", () => {
 
-async function login() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const errorMsg = document.getElementById("errorMsg");
-  errorMsg.innerText = "";
-
-  if (!username || !password) {
-    errorMsg.innerText = "Please enter both username and password.";
+  // Redirect if token exists
+  const token = localStorage.getItem("token");
+  if (token) {
+    window.location.href = "interview.html";
     return;
   }
 
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const loginBtn = document.getElementById("loginBtn");
+  const errorMsg = document.getElementById("errorMsg");
 
-    if (!res.ok) throw new Error('Network response not ok');
+  usernameInput.focus();
 
-    const data = await res.json();
+  async function login() {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+    errorMsg.innerText = "";
 
-    if (data.success) {
-      localStorage.setItem("token", data.token);
-      window.location.href = "interview.html";
-    } else {
-      errorMsg.innerText = "Invalid credentials.";
+    if (!username || !password) {
+      errorMsg.innerText = "Please enter both username and password.";
+      return;
     }
 
-  } catch (err) {
-    console.error(err);
-    errorMsg.innerText = "Server error, please try again later.";
-  }
-}
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
 
-// Event listeners
-document.getElementById("loginBtn").addEventListener("click", login);
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") login();
-});
-  window.addEventListener("DOMContentLoaded", () => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    // Optionally, verify token with backend first
-    window.location.href = "interview.html";
-  }
-});
+      if (!res.ok) throw new Error('Network response not ok');
 
+      const data = await res.json();
+
+      if (data.success) {
+        localStorage.setItem("token", data.token);
+        window.location.href = "interview.html";
+      } else {
+        errorMsg.innerText = "Invalid credentials.";
+      }
+
+    } catch (err) {
+      console.error(err);
+      errorMsg.innerText = "Server error, please try again later.";
+    }
+  }
+
+  loginBtn.addEventListener("click", login);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") login();
+  });
+
+});
 </script>
 
 </body>
 </html>
-
