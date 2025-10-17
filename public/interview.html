@@ -6,11 +6,32 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 /* 🔹 GENERAL STYLES */
-body { font-family: 'Poppins', sans-serif; background: #e0eafc; padding: 20px; margin: 0; text-align: center; display:none; }
-h1 { color: #004a99; margin-bottom: 10px; }
-h2.subheading, h3.subheading { color: #004a99; font-weight: 400; margin: 5px 0; font-size: 18px; }
-h3.subheading { padding-bottom: 30px; }
-#breadcrumb { margin: 10px 0; font-size:14px; color:#004a99; }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #e0eafc;
+  padding: 20px;
+  margin: 0;
+  text-align: center;
+  display:none;
+}
+h1 {
+  color: #004a99;
+  margin-bottom: 10px;
+}
+h2.subheading, h3.subheading {
+  color: #004a99;
+  font-weight: 400;
+  margin: 5px 0;
+  font-size: 18px;
+}
+h3.subheading {
+  padding-bottom: 30px;
+}
+#breadcrumb {
+  margin: 10px 0;
+  font-size:14px;
+  color:#004a99;
+}
 /* 🔹 BUTTONS */
 .btn {
   padding: 14px 22px;
@@ -22,36 +43,121 @@ h3.subheading { padding-bottom: 30px; }
   cursor: pointer;
   transition: 0.3s;
 }
-
-.btn:hover {
-  opacity: 0.9;
-  box-shadow: 0 4px 12px rgba(0, 74, 153, 0.3);
-  transform: translateY(-2px);
+.btn-category {
+  background: #004a99;
+  color: white;
 }
-
-.btn-category { background: #004a99; color: white; }
-.btn-year, .btn-month { background: #0066cc; color: white; }
-.btn-date { background: #66ccff; color: white; }
-.btn-active { background: white !important; color: #004a99 !important; border: 1px solid #004a99; }
-.btn:hover { opacity: 0.8; }
-.section { margin-top: 20px; display: none; }
-.date-input-container { margin-top: 20px; }
-.date-input { padding: 6px; width: 150px; font-size: 14px; margin-right: 6px; }
-.profiles-wrapper { display: flex; flex-wrap: wrap; justify-content: flex-start; margin-top: 20px; }
-.profile-container { background: #ffffff; border-radius: 8px; padding: 12px; margin: 5px; width: 300px; text-align: left; font-size: 12px; box-shadow: 2px 2px 8px #cbd8e6, -2px -2px 8px #f7faff; }
-.profile-table { width: 100%; border-collapse: collapse; }
-.profile-table td { padding: 4px 6px; }
-.label { width: 40%; font-weight: 500; color: #004a99; text-align: left; }
-.editable { background-color: #f7faff; border-radius: 4px; padding: 4px 6px; width: 95%; border: 1px solid transparent; display:inline-block; }
-.editable:focus { border: 1px solid #ff944d; outline: none; background-color: #fffefc; }
-select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; background:rgb(0, 153, 255); color:white; width:100%; }
-.time-input { background:yellow; width:95%; padding:4px; border-radius:4px; border:none; color:black; }
-  
-#addMoreBtn { margin-top: 10px; }
-#saveBtn, #clearBtn, #logoutBtn { margin-top: 20px; padding: 10px 20px; font-size: 14px; cursor: pointer; border-radius: 8px; border:none; color:white; }
-#saveBtn { background:#004a99; }
-#clearBtn { background:#cc3300; margin-left: 10px; }
-#logoutBtn { background:#666666; margin-left: 10px; }
+.btn-year, .btn-month {
+  background: #0066cc;
+  color: white;
+}
+.btn-date {
+  background: #66ccff;
+  color: white;
+}
+.btn-active {
+  background: white !important;
+  color: #004a99 !important;
+  border: 1px solid #004a99;
+}
+.btn:hover {
+  opacity: 0.8;
+}
+.section {
+  margin-top: 20px;
+  display: none;
+}
+.date-input-container {
+  margin-top: 20px;
+}
+.date-input {
+  padding: 6px;
+  width: 150px;
+  font-size: 14px;
+  margin-right: 6px;
+}
+.profiles-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 20px;
+}
+.profile-container {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 5px;
+  width: 300px;
+  text-align: left;
+  font-size: 12px;
+  box-shadow: 2px 2px 8px #cbd8e6, -2px -2px 8px #f7faff;
+}
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.profile-table td {
+  padding: 4px 6px;
+}
+.label {
+  width: 40%;
+  font-weight: 500;
+  color: #004a99;
+  text-align: left;
+}
+.editable {
+  background-color: #f7faff;
+  border-radius: 4px;
+  padding: 4px 6px;
+  width: 95%;
+  border: 1px solid transparent;
+  display:inline-block;
+}
+.editable:focus {
+  border: 1px solid #ff944d;
+  outline: none;
+  background-color: #fffefc;
+}
+select {
+  padding: 4px 6px;
+  border-radius:6px;
+  border:none;
+  cursor:pointer;
+  background:rgb(0, 153, 255);
+  color:white;
+  width:100%;
+}
+.time-input {
+  background:yellow;
+  width:95%;
+  padding:4px;
+  border-radius:4px;
+  border:none;
+  color:black;
+}
+#addMoreBtn {
+  margin-top: 10px;
+}
+#saveBtn, #clearBtn, #logoutBtn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 8px;
+  border:none;
+  color:white;
+}
+#saveBtn {
+  background:#004a99;
+}
+#clearBtn {
+  background:#cc3300;
+  margin-left: 10px;
+}
+#logoutBtn {
+  background:#666666;
+  margin-left: 10px;
+}
 </style>
 </head>
 <body>
@@ -153,4 +259,3 @@ window.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
-
