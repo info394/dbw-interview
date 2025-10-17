@@ -62,6 +62,13 @@ app.post('/api/applicants', async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Database error' });
   }
+
+  fetch('https://dbw-interview.onrender.com/api/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ username, password })
+})
+
 });
 
 // DELETE APPLICANT
@@ -92,3 +99,13 @@ app.get('*', (req, res) => {
 // START SERVER
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
+
+
+// --- SERVE FRONTEND ---
+app.use(express.static(path.join(__dirname, 'public')));
+
+// This catches all other requests and serves index.html (frontend router)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'interview.html'));
+});
+
