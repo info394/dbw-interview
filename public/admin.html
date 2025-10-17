@@ -60,30 +60,43 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #f0f4ff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 10px 15px;
+      background: linear-gradient(135deg, #dceeff, #f0f4ff);
+      border: 1px solid #b0c4de;
+      border-radius: 12px;
+      padding: 12px 18px;
       width: 100%;
       max-width: 400px;
       margin: 10px auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      font-weight: 500;
+      color: #003366;
+      position: relative;
     }
     .applicant-card {
       background: white;
       border: 1px solid #ddd;
       border-radius: 8px;
       max-width: 400px;
-      margin: 10px auto;
-      padding: 10px;
+      margin: 5px auto 20px;
+      padding: 10px 16px;
       font-weight: 500;
+      font-size: 16px;
+      text-align: left;
+      color: #222;
     }
     .delete-btn {
-      background: red;
-      color: white;
+      background: none;
       border: none;
-      border-radius: 5px;
-      padding: 5px 10px;
+      color: red;
+      font-size: 18px;
+      font-weight: bold;
       cursor: pointer;
+      padding: 0;
+      margin-left: 12px;
+      transition: color 0.2s;
+    }
+    .delete-btn:hover {
+      color: darkred;
     }
   </style>
 </head>
@@ -151,7 +164,6 @@
 
           if (data.success) {
             localStorage.setItem("token", data.token);
-            // Instead of redirecting, show date section
             document.querySelector(".login-box").style.display = "none";
             dateSection.style.display = "block";
           } else {
@@ -175,7 +187,6 @@
       });
     });
 
-    // ✅ Function to add date and show applicant card
     function addDate() {
       const dateInput = document.getElementById("dateInput");
       const dateValue = dateInput.value;
@@ -187,7 +198,6 @@
 
       const datesContainer = document.getElementById("datesContainer");
 
-      // Create date button container
       const dateDiv = document.createElement("div");
       dateDiv.className = "date-button";
 
@@ -196,7 +206,8 @@
 
       const deleteBtn = document.createElement("button");
       deleteBtn.className = "delete-btn";
-      deleteBtn.textContent = "Delete";
+      deleteBtn.innerHTML = "&times;";
+      deleteBtn.title = "Delete this date";
       deleteBtn.onclick = () => {
         datesContainer.removeChild(dateDiv);
         datesContainer.removeChild(applicantCard);
@@ -206,14 +217,13 @@
       dateDiv.appendChild(deleteBtn);
       datesContainer.appendChild(dateDiv);
 
-      // Create applicant card
       const applicantCard = document.createElement("div");
       applicantCard.className = "applicant-card";
       applicantCard.textContent = `Applicant (${dateValue})`;
 
       datesContainer.appendChild(applicantCard);
 
-      dateInput.value = ""; // Clear input
+      dateInput.value = "";
     }
   </script>
 
