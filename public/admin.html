@@ -98,7 +98,16 @@ document.getElementById("loginBtn").addEventListener("click", login);
 document.addEventListener("keydown", (e) => {
   if (e.key === "Enter") login();
 });
+  window.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    // Optionally, verify token with backend first
+    window.location.href = "interview.html";
+  }
+});
+
 </script>
 
 </body>
 </html>
+
