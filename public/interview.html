@@ -10,7 +10,7 @@ h1 { color: #004a99; margin-bottom: 10px; }
 h2.subheading, h3.subheading { color: #004a99; font-weight: 400; margin: 5px 0; font-size: 18px; }
 h3.subheading { padding-bottom: 30px; }
 #breadcrumb { margin: 10px 0; font-size:14px; color:#004a99; }
-.btn { padding: 14px 22px; margin: 5px; font-size: 16px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: 0.3s; }
+.btn { padding: 10px 16px; margin: 5px; font-size: 14px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: 0.3s; }
 .btn-category { background: #004a99; color: white; }
 .btn-year, .btn-month { background: #0066cc; color: white; }
 .btn-date { background: #66ccff; color: white; }
@@ -160,26 +160,36 @@ function renderMonths(){
 }
 
 // Date input
-document.getElementById('addDateBtn').onclick=()=>{
-  const dateVal=document.getElementById('dateInput').value.trim();
-  addMoreBtn.style.display='block'; updateBreadcrumb(); profilesWrapper.innerHTML='';
-  if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear]
-     && interviewData[selectedCategory][selectedYear][selectedMonth]
-     && interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]){
-       interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate].forEach(a=>{
-         profilesWrapper.appendChild(createApplicantDiv(a));
-       });
-  }
+document.getElementById('addDateBtn').onclick = () => {
+    const dateVal = document.getElementById('dateInput').value.trim();
+    if(!dateVal){ alert('Enter a date'); return; }
+    selectedDate = dateVal; // raw input
+    addMoreBtn.style.display = 'block';
+    updateBreadcrumb();
+    profilesWrapper.innerHTML='';
+
+    if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear]
+       && interviewData[selectedCategory][selectedYear][selectedMonth]
+       && interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]){
+         interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate].forEach(a=>{
+           profilesWrapper.appendChild(createApplicantDiv(a));
+         });
+    }
 };
 
 // Applicant card
 function createApplicantDiv(app){
-  const div=document.createElement('div'); div.className='profile-container';
-  const label=document.createElement('div'); label.className='profile-label'; label.textContent='Applicant';
+  const div = document.createElement('div'); 
+  div.className = 'profile-container';
+  
+  const label = document.createElement('div'); 
+  label.className = 'profile-label'; 
+  label.textContent = 'Applicant';
   div.appendChild(label);
 
-  const table=document.createElement('table'); table.className='profile-table';
-  table.innerHTML=`
+  const table = document.createElement('table'); 
+  table.className = 'profile-table';
+  table.innerHTML = `
     <tr><td class="label">Name:</td><td><span class="editable" contenteditable="true">${app.name||''}</span></td></tr>
     <tr><td class="label">Visa:</td><td><span class="editable" contenteditable="true">${app.visa||''}</span></td></tr>
     <tr><td class="label">Nationality:</td><td><select class="nationality-select">${nationalities.map(n=>`<option ${app.nationality===n?'selected':''}>${n}</option>`).join('')}</select></td></tr>
@@ -199,6 +209,54 @@ function createApplicantDiv(app){
   `;
   div.appendChild(table);
   div.dataset.id = app._id || null;
+
+  // --- Buttons Container ---
+  const btnContainer = document.createElement('div');
+  btnContainer.style.marginTop = '10px';
+  
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = 'Save Table';
+  saveBtn.className = 'btn btn-category';
+  saveBtn.onclick = async () => {
+    const a = {_id: div.dataset.id, category:selectedCategory, year:selectedYear, month:selectedMonth, date:selectedDate};
+    const editables = div.querySelectorAll('span.editable');
+    a.name = editables[0].textContent.trim();
+    a.visa = editables[1].textContent.trim();
+    a.nationality = div.querySelector('select.nationality-select').value;
+    a.salary = editables[2].textContent.trim();
+    a.education = div.querySelector('select.education-select').value;
+    a.contact = editables[3].textContent.trim();
+    a.email = editables[4].textContent.trim();
+    a.time = div.querySelector('input.time-input').value;
+    a.status = div.querySelector('select.status-select').value;
+    a.notes = div.querySelector('textarea.notes-input').value;
+
+    await fetch(API_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(a)});
+    alert('Applicant saved');
+    await loadFromServer();
+  };
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete Table';
+  deleteBtn.className = 'btn btn-month';
+  deleteBtn.style.marginLeft = '5px';
+  deleteBtn.onclick = async () => {
+    if(!div.dataset.id){ 
+      div.remove(); // Remove unsaved card
+      return; 
+    }
+    if(confirm('Delete this applicant?')){
+      await fetch(`${API_URL}/${div.dataset.id}`, {method:'DELETE'});
+      div.remove();
+      alert('Applicant deleted');
+      await loadFromServer();
+    }
+  };
+
+  btnContainer.appendChild(saveBtn);
+  btnContainer.appendChild(deleteBtn);
+  div.appendChild(btnContainer);
+
   return div;
 }
 
@@ -248,6 +306,3 @@ loadFromServer();
 </script>
 </body>
 </html>
-
-
-
