@@ -13,7 +13,26 @@ h3.subheading { padding-bottom: 30px; }
 .btn { padding: 14px 22px; margin: 5px; font-size: 16px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: 0.3s; }
 .btn-category { background: #004a99; color: white; }
 .btn-year, .btn-month { background: #0066cc; color: white; }
-.btn-date { background: #66ccff; color: white; }
+.btn-date { 
+  position: relative;
+  background: #66ccff;
+  color: white;
+  border-radius: 12px;
+  margin: 5px;
+  padding: 10px 20px;
+  display: inline-block;
+}
+.date-x {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  padding: 2px 5px;
+  cursor: pointer;
+}
 .btn-active { background: white !important; color: #004a99 !important; border: 1px solid #004a99; }
 .btn:hover { opacity: 0.8; }
 .section { margin-top: 20px; display: none; }
@@ -51,6 +70,7 @@ select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; backg
     <input type="text" placeholder="Enter Date" id="dateInput" class="date-input">
     <button id="addDateBtn" class="btn btn-month">Add Date</button>
   </div>
+  <div id="dateButtonsContainer" style="margin-top:10px;"></div>
 </div>
 
 <div id="profilesWrapper" class="profiles-wrapper"></div>
@@ -59,10 +79,7 @@ select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; backg
 <button id="clearBtn">Clear All</button>
 
 <script>
-// Backend URL
 const API_URL = 'https://dbw-interview.onrender.com/api/applicants';
-
-// Options
 const categories=["PETRA","KEDMA","Logistics Manager","Logistics Assistant","Carpenter","Operations Supervisor","Electrician"];
 const years=["2025","2026"];
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -70,6 +87,7 @@ const nationalities=["Algerian","Bhutanese","Cambodia","Cameroonian","Chad","Col
 const educationList=["Master's","Bachelor's","Bachelor's Diploma","High School","College Diploma","College","College Undergraduate","High School Diploma","Diploma","Certificate","University"];
 
 let interviewData = {};
+let selectedCategory=null, selectedYear=null, selectedMonth=null, selectedDate=null;
 const categoryContainer=document.getElementById("categoryContainer");
 const yearContainer=document.getElementById("yearContainer");
 const monthContainer=document.getElementById("monthContainer");
@@ -79,9 +97,6 @@ const breadcrumbDiv=document.getElementById("breadcrumb");
 const addMoreBtn=document.getElementById("addMoreBtn");
 const clearBtn=document.getElementById("clearBtn");
 
-let selectedCategory=null, selectedYear=null, selectedMonth=null, selectedDate=null;
-
-// Load data
 async function loadFromServer(){
   try{
     const res=await fetch(API_URL);
@@ -95,16 +110,15 @@ async function loadFromServer(){
       interviewData[item.category][item.year][item.month][item.date].push(item);
     });
     renderCategories();
-  }catch(err){ console.error(err); renderCategories(); }
+  }catch(e){ renderCategories(); }
 }
 
-// Breadcrumb
 function updateBreadcrumb(){
   const crumbs=[];
-  if(selectedCategory) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('category')">${selectedCategory}</span>`);
-  if(selectedYear) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('year')">${selectedYear}</span>`);
-  if(selectedMonth) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('month')">${selectedMonth}</span>`);
-  if(selectedDate) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('date')">${selectedDate}</span>`);
+  if(selectedCategory) crumbs.push(`<span onclick="goBack('category')" style="cursor:pointer;">${selectedCategory}</span>`);
+  if(selectedYear) crumbs.push(`<span onclick="goBack('year')" style="cursor:pointer;">${selectedYear}</span>`);
+  if(selectedMonth) crumbs.push(`<span onclick="goBack('month')" style="cursor:pointer;">${selectedMonth}</span>`);
+  if(selectedDate) crumbs.push(`<span onclick="goBack('date')" style="cursor:pointer;">${selectedDate}</span>`);
   breadcrumbDiv.innerHTML=crumbs.join(" > ");
 }
 
@@ -115,140 +129,101 @@ function goBack(level){
   else if(level==='date'){ selectedDate=null; }
   profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
   yearContainer.style.display=monthContainer.style.display=dateContainer.style.display='none';
-  renderCategories();
-  if(selectedCategory) renderYears();
-  if(selectedYear) renderMonths();
-  updateBreadcrumb();
+  renderCategories(); if(selectedCategory) renderYears(); if(selectedYear) renderMonths(); updateBreadcrumb();
 }
 
-// Render buttons
 function renderCategories(){
   categoryContainer.innerHTML='';
   categories.forEach(c=>{
-    const btn=document.createElement('button');
-    btn.textContent=c;
-    btn.className='btn btn-category';
-    btn.onclick=()=>{ selectedCategory=c; yearContainer.style.display='block'; renderYears(); updateBreadcrumb(); };
-    categoryContainer.appendChild(btn);
+    const b=document.createElement('button'); b.textContent=c; b.className='btn btn-category';
+    b.onclick=()=>{ selectedCategory=c; yearContainer.style.display='block'; renderYears(); updateBreadcrumb(); };
+    categoryContainer.appendChild(b);
   });
-  yearContainer.style.display=monthContainer.style.display=dateContainer.style.display='none';
-  profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
 }
 
 function renderYears(){
   yearContainer.innerHTML='';
   years.forEach(y=>{
-    const btn=document.createElement('button');
-    btn.textContent=y;
-    btn.className='btn btn-year';
-    btn.onclick=()=>{ selectedYear=y; monthContainer.style.display='block'; renderMonths(); updateBreadcrumb(); };
-    yearContainer.appendChild(btn);
+    const b=document.createElement('button'); b.textContent=y; b.className='btn btn-year';
+    b.onclick=()=>{ selectedYear=y; monthContainer.style.display='block'; renderMonths(); updateBreadcrumb(); };
+    yearContainer.appendChild(b);
   });
-  monthContainer.style.display=dateContainer.style.display='none';
-  profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
 }
 
 function renderMonths(){
   monthContainer.innerHTML='';
   months.forEach(m=>{
-    const btn=document.createElement('button');
-    btn.textContent=m;
-    btn.className='btn btn-month';
-    btn.onclick=()=>{ selectedMonth=m; dateContainer.style.display='block'; updateBreadcrumb(); profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; };
-    monthContainer.appendChild(btn);
+    const b=document.createElement('button'); b.textContent=m; b.className='btn btn-month';
+    b.onclick=()=>{ selectedMonth=m; dateContainer.style.display='block'; updateBreadcrumb(); };
+    monthContainer.appendChild(b);
   });
 }
 
-// Date input
+// ✅ Add date button logic
 document.getElementById('addDateBtn').onclick=()=>{
   const dateVal=document.getElementById('dateInput').value.trim();
-  addMoreBtn.style.display='block'; updateBreadcrumb(); profilesWrapper.innerHTML='';
-  if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear]
-     && interviewData[selectedCategory][selectedYear][selectedMonth]
-     && interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]){
-       interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate].forEach(a=>{
-         profilesWrapper.appendChild(createApplicantDiv(a));
-       });
-  }
+  if(!dateVal){ alert('Enter a date'); return; }
+
+  const dateBtn=document.createElement('div');
+  dateBtn.className='btn btn-date';
+  dateBtn.textContent=dateVal;
+
+  const x=document.createElement('span');
+  x.className='date-x';
+  x.textContent='×';
+  x.onclick=(e)=>{ e.stopPropagation(); if(confirm('Delete this date?')) dateBtn.remove(); };
+  dateBtn.appendChild(x);
+
+  dateBtn.onclick=()=>{
+    selectedDate=dateVal;
+    addMoreBtn.style.display='block';
+    profilesWrapper.innerHTML='';
+    updateBreadcrumb();
+
+    if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear] &&
+       interviewData[selectedCategory][selectedYear][selectedMonth] &&
+       interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]){
+         interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate].forEach(a=>{
+           profilesWrapper.appendChild(createApplicantDiv(a));
+         });
+    }
+  };
+
+  document.getElementById('dateButtonsContainer').appendChild(dateBtn);
+  document.getElementById('dateInput').value='';
 };
 
-// Applicant card
+// ✅ Create applicant card
 function createApplicantDiv(app){
-  const div=document.createElement('div'); div.className='profile-container';
-  const label=document.createElement('div'); label.className='profile-label'; label.textContent='Applicant';
-  div.appendChild(label);
-
-  const table=document.createElement('table'); table.className='profile-table';
-  table.innerHTML=`
-    <tr><td class="label">Name:</td><td><span class="editable" contenteditable="true">${app.name||''}</span></td></tr>
-    <tr><td class="label">Visa:</td><td><span class="editable" contenteditable="true">${app.visa||''}</span></td></tr>
-    <tr><td class="label">Nationality:</td><td><select class="nationality-select">${nationalities.map(n=>`<option ${app.nationality===n?'selected':''}>${n}</option>`).join('')}</select></td></tr>
-    <tr><td class="label">Salary:</td><td><span class="editable" contenteditable="true">${app.salary||''}</span></td></tr>
-    <tr><td class="label">Education:</td><td><select class="education-select">${educationList.map(e=>`<option ${app.education===e?'selected':''}>${e}</option>`).join('')}</select></td></tr>
-    <tr><td class="label">Contact:</td><td><span class="editable" contenteditable="true">${app.contact||''}</span></td></tr>
-    <tr><td class="label">Email:</td><td><span class="editable" contenteditable="true">${app.email||''}</span></td></tr>
-    <tr><td class="label">Time:</td><td><input type="time" class="time-input" value="${app.time||''}"></td></tr>
-    <tr><td class="label">Status:</td><td>
-      <select class="status-select">
-        <option ${app.status==='Accepted'?'selected':''}>Accepted</option>
-        <option ${app.status==='Rejected'?'selected':''}>Rejected</option>
-        <option ${app.status==='Hold'?'selected':''}>Hold</option>
-      </select>
-    </td></tr>
-    <tr><td class="label">Notes:</td><td><textarea class="notes-input">${app.notes||''}</textarea></td></tr>
+  const div=document.createElement('div');
+  div.className='profile-container';
+  div.innerHTML=`
+    <div class="profile-label">Applicant</div>
+    <table class="profile-table">
+      <tr><td class="label">Name:</td><td><span class="editable" contenteditable="true">${app.name||''}</span></td></tr>
+      <tr><td class="label">Visa:</td><td><span class="editable" contenteditable="true">${app.visa||''}</span></td></tr>
+      <tr><td class="label">Nationality:</td><td><select class="nationality-select">${nationalities.map(n=>`<option ${app.nationality===n?'selected':''}>${n}</option>`).join('')}</select></td></tr>
+      <tr><td class="label">Salary:</td><td><span class="editable" contenteditable="true">${app.salary||''}</span></td></tr>
+      <tr><td class="label">Education:</td><td><select class="education-select">${educationList.map(e=>`<option ${app.education===e?'selected':''}>${e}</option>`).join('')}</select></td></tr>
+      <tr><td class="label">Contact:</td><td><span class="editable" contenteditable="true">${app.contact||''}</span></td></tr>
+      <tr><td class="label">Email:</td><td><span class="editable" contenteditable="true">${app.email||''}</span></td></tr>
+      <tr><td class="label">Time:</td><td><input type="time" class="time-input" value="${app.time||''}"></td></tr>
+      <tr><td class="label">Status:</td><td><select class="status-select"><option>Accepted</option><option>Rejected</option><option>Hold</option></select></td></tr>
+      <tr><td class="label">Notes:</td><td><textarea class="notes-input">${app.notes||''}</textarea></td></tr>
+    </table>
   `;
-  div.appendChild(table);
-  div.dataset.id = app._id || null;
+  div.querySelector('.status-select').value=app.status||'Accepted';
   return div;
 }
 
-// Add new applicant
+// ✅ Add more applicant — no dialog
 addMoreBtn.onclick=()=>{
-  if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate){ alert('Select Category, Year, Month, Date'); return; }
-  const newApp={category:selectedCategory, year:selectedYear, month:selectedMonth, date:selectedDate, name:'', visa:'', nationality:nationalities[0], salary:'', education:educationList[0], contact:'', email:'', time:'', status:'Accepted', notes:''};
+  if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate) return;
+  const newApp={category:selectedCategory,year:selectedYear,month:selectedMonth,date:selectedDate};
   profilesWrapper.appendChild(createApplicantDiv(newApp));
 };
 
-// Save all
-document.getElementById('saveBtn').onclick=async()=>{
-  const profiles=profilesWrapper.querySelectorAll('.profile-container');
-  for(let p of profiles){
-    const a={_id:p.dataset.id, category:selectedCategory, year:selectedYear, month:selectedMonth, date:selectedDate};
-    const editables=p.querySelectorAll('span.editable');
-    a.name=editables[0].textContent.trim();
-    a.visa=editables[1].textContent.trim();
-    a.nationality=p.querySelector('select.nationality-select').value;
-    a.salary=editables[2].textContent.trim();
-    a.education=p.querySelector('select.education-select').value;
-    a.contact=editables[3].textContent.trim();
-    a.email=editables[4].textContent.trim();
-    a.time=p.querySelector('input.time-input').value;
-    a.status=p.querySelector('select.status-select').value;
-    a.notes=p.querySelector('textarea.notes-input').value;
-    await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(a)});
-  }
-  alert('All profiles saved'); await loadFromServer();
-};
-
-// Clear all
-clearBtn.onclick=async()=>{
-  if(!confirm('Delete all applicants for this date?')) return;
-  if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate){ alert('Select Category, Year, Month, Date'); return; }
-  if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear] && interviewData[selectedCategory][selectedYear][selectedMonth] && interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]){
-    const arr=interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate];
-    for(let a of arr) if(a._id) await fetch(`${API_URL}/${a._id}`,{method:'DELETE'});
-    interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]=[];
-    profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
-  }
-  alert('Cleared all applicants'); await loadFromServer();
-};
-
-// Initial load
 loadFromServer();
 </script>
 </body>
 </html>
-
-
-
-
