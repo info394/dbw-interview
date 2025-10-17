@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>INTERVIEW | Applicant Profiles</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
 <style>
 /* 🔹 GENERAL STYLES */
 body {
@@ -12,7 +12,7 @@ body {
   padding: 20px;
   margin: 0;
   text-align: center;
-  display:none;
+  display: none;
 }
 h1 {
   color: #004a99;
@@ -29,8 +29,8 @@ h3.subheading {
 }
 #breadcrumb {
   margin: 10px 0;
-  font-size:14px;
-  color:#004a99;
+  font-size: 14px;
+  color: #004a99;
 }
 /* 🔹 BUTTONS */
 .btn {
@@ -111,7 +111,7 @@ h3.subheading {
   padding: 4px 6px;
   width: 95%;
   border: 1px solid transparent;
-  display:inline-block;
+  display: inline-block;
 }
 .editable:focus {
   border: 1px solid #ff944d;
@@ -120,20 +120,20 @@ h3.subheading {
 }
 select {
   padding: 4px 6px;
-  border-radius:6px;
-  border:none;
-  cursor:pointer;
-  background:rgb(0, 153, 255);
-  color:white;
-  width:100%;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: rgb(0, 153, 255);
+  color: white;
+  width: 100%;
 }
 .time-input {
-  background:yellow;
-  width:95%;
-  padding:4px;
-  border-radius:4px;
-  border:none;
-  color:black;
+  background: yellow;
+  width: 95%;
+  padding: 4px;
+  border-radius: 4px;
+  border: none;
+  color: black;
 }
 #addMoreBtn {
   margin-top: 10px;
@@ -144,18 +144,18 @@ select {
   font-size: 14px;
   cursor: pointer;
   border-radius: 8px;
-  border:none;
-  color:white;
+  border: none;
+  color: white;
 }
 #saveBtn {
-  background:#004a99;
+  background: #004a99;
 }
 #clearBtn {
-  background:#cc3300;
+  background: #cc3300;
   margin-left: 10px;
 }
 #logoutBtn {
-  background:#666666;
+  background: #666666;
   margin-left: 10px;
 }
 </style>
@@ -172,7 +172,7 @@ select {
 <div id="monthContainer" class="section"></div>
 <div id="dateContainer" class="section">
   <div class="date-input-container">
-    <input type="text" placeholder="Enter Date (YYYY-MM-DD)" id="dateInput" class="date-input">
+    <input type="text" placeholder="Enter Date (YYYY-MM-DD)" id="dateInput" class="date-input" />
     <button id="addDateBtn" class="btn btn-month">Add Date</button>
   </div>
 </div>
@@ -248,14 +248,302 @@ async function deleteApplicantFromServer(id) {
   await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
 }
 
-// ... (keep all previous functions for rendering categories, years, months, applicants)
+// Render categories buttons
+function renderCategories() {
+  categoryContainer.innerHTML = '';
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.textContent = cat;
+    btn.className = 'btn btn-category';
+    if (cat === selectedCategory) btn.classList.add('btn-active');
+    btn.onclick = () => {
+      selectedCategory = cat;
+      selectedYear = null;
+      selectedMonth = null;
+      selectedDate = null;
+      renderCategories();
+      renderYears();
+      yearContainer.style.display = 'block';
+      monthContainer.style.display = 'none';
+      dateContainer.style.display = 'none';
+      profilesWrapper.innerHTML = '';
+      addMoreBtn.style.display = 'none';
+      updateBreadcrumb();
+    };
+    categoryContainer.appendChild(btn);
+  });
+  yearContainer.style.display = selectedCategory ? 'block' : 'none';
+}
 
-// 🔹 ADDITION: Hide content until verified
-window.addEventListener('DOMContentLoaded', ()=>{
-  if(localStorage.getItem("token")){
-    document.body.style.display='block';
+// Render years buttons
+function renderYears() {
+  yearContainer.innerHTML = '';
+  years.forEach(yr => {
+    const btn = document.createElement('button');
+    btn.textContent = yr;
+    btn.className = 'btn btn-year';
+    if (yr === selectedYear) btn.classList.add('btn-active');
+    btn.onclick = () => {
+      selectedYear = yr;
+      selectedMonth = null;
+      selectedDate = null;
+      renderYears();
+      renderMonths();
+      monthContainer.style.display = 'block';
+      dateContainer.style.display = 'none';
+      profilesWrapper.innerHTML = '';
+      addMoreBtn.style.display = 'none';
+      updateBreadcrumb();
+    };
+    yearContainer.appendChild(btn);
+  });
+}
+
+// Render months buttons
+function renderMonths() {
+  monthContainer.innerHTML = '';
+  months.forEach((mnth, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = mnth;
+    btn.className = 'btn btn-month';
+    if (mnth === selectedMonth) btn.classList.add('btn-active');
+    btn.onclick = () => {
+      selectedMonth = mnth;
+      selectedDate = null;
+      renderMonths();
+      dateContainer.style.display = 'block';
+      profilesWrapper.innerHTML = '';
+      addMoreBtn.style.display = 'none';
+      updateBreadcrumb();
+    };
+    monthContainer.appendChild(btn);
+  });
+}
+
+// Update breadcrumb display
+function updateBreadcrumb() {
+  let parts = [];
+  if (selectedCategory) parts.push(selectedCategory);
+  if (selectedYear) parts.push(selectedYear);
+  if (selectedMonth) parts.push(selectedMonth);
+  if (selectedDate) parts.push(selectedDate);
+  breadcrumbDiv.textContent = parts.join(' > ');
+}
+
+// Render profiles for selected date
+function renderProfiles() {
+  profilesWrapper.innerHTML = '';
+  if (!selectedCategory || !selectedYear || !selectedMonth || !selectedDate) {
+    addMoreBtn.style.display = 'none';
+    return;
   }
-});
+  const profiles = interviewData?.[selectedCategory]?.[selectedYear]?.[selectedMonth]?.[selectedDate] || [];
+  if (!profiles.length) {
+    profilesWrapper.innerHTML = '<p>No applicants found for this date.</p>';
+  } else {
+    profiles.forEach(profile => {
+      profilesWrapper.appendChild(createProfileCard(profile));
+    });
+  }
+  addMoreBtn.style.display = 'inline-block';
+}
+
+// Create profile card DOM element
+function createProfileCard(profile) {
+  const container = document.createElement('div');
+  container.className = 'profile-container';
+  container.dataset.id = profile._id || ''; // Store id for saving/deleting
+
+  // Helper to create editable field
+  function createEditableField(value, field, type = 'text', options = []) {
+    if (type === 'select') {
+      const select = document.createElement('select');
+      options.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt;
+        option.textContent = opt;
+        if (opt === value) option.selected = true;
+        select.appendChild(option);
+      });
+      select.onchange = () => {
+        profile[field] = select.value;
+      };
+      return select;
+    } else if (type === 'textarea') {
+      const ta = document.createElement('textarea');
+      ta.className = 'editable';
+      ta.value = value || '';
+      ta.oninput = () => {
+        profile[field] = ta.value;
+      };
+      return ta;
+    } else {
+      const input = document.createElement('input');
+      input.type = type;
+      input.className = 'editable';
+      input.value = value || '';
+      input.oninput = () => {
+        profile[field] = input.value;
+      };
+      return input;
+    }
+  }
+
+  // Build table of editable fields
+  const table = document.createElement('table');
+  table.className = 'profile-table';
+
+  function addRow(labelText, field, type = 'text', opts = []) {
+    const tr = document.createElement('tr');
+    const tdLabel = document.createElement('td');
+    tdLabel.className = 'label';
+    tdLabel.textContent = labelText;
+    const tdInput = document.createElement('td');
+    tdInput.appendChild(createEditableField(profile[field], field, type, opts));
+    tr.appendChild(tdLabel);
+    tr.appendChild(tdInput);
+    table.appendChild(tr);
+  }
+
+  addRow('Applicant Name', 'name');
+  addRow('Nationality', 'nationality', 'select', nationalities);
+  addRow('Education', 'education', 'select', educationList);
+  addRow('Experience (years)', 'experience');
+  addRow('Phone Number', 'phone');
+  addRow('Interview Time', 'time', 'text');
+  addRow('Comments', 'comments', 'textarea');
+
+  container.appendChild(table);
+
+  // Add delete button
+  const delBtn = document.createElement('button');
+  delBtn.textContent = 'Delete';
+  delBtn.className = 'btn btn-month';
+  delBtn.style.marginTop = '8px';
+  delBtn.onclick = async () => {
+    if (profile._id) {
+      if (confirm('Delete this applicant?')) {
+        await deleteApplicantFromServer(profile._id);
+        // Remove from local
+        const arr = interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate];
+        const index = arr.findIndex(p => p._id === profile._id);
+        if (index > -1) arr.splice(index, 1);
+        renderProfiles();
+      }
+    } else {
+      // Not saved yet - just remove from display
+      const arr = interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate];
+      const index = arr.indexOf(profile);
+      if (index > -1) arr.splice(index, 1);
+      renderProfiles();
+    }
+  };
+  container.appendChild(delBtn);
+
+  return container;
+}
+
+// Add new blank applicant form
+function addNewApplicant() {
+  if (!selectedCategory || !selectedYear || !selectedMonth || !selectedDate) {
+    alert('Select Category, Year, Month and Date first');
+    return;
+  }
+  if (!interviewData[selectedCategory]) interviewData[selectedCategory] = {};
+  if (!interviewData[selectedCategory][selectedYear]) interviewData[selectedCategory][selectedYear] = {};
+  if (!interviewData[selectedCategory][selectedYear][selectedMonth]) interviewData[selectedCategory][selectedYear][selectedMonth] = {};
+  if (!interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]) interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate] = [];
+
+  const newApplicant = {
+    category: selectedCategory,
+    year: selectedYear,
+    month: selectedMonth,
+    date: selectedDate,
+    name: '',
+    nationality: nationalities[0],
+    education: educationList[0],
+    experience: '',
+    phone: '',
+    time: '',
+    comments: ''
+  };
+  interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate].push(newApplicant);
+  renderProfiles();
+}
+
+// Save all applicants on current date
+async function saveAllApplicants() {
+  if (!selectedCategory || !selectedYear || !selectedMonth || !selectedDate) {
+    alert('Select Category, Year, Month and Date first');
+    return;
+  }
+  const arr = interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate] || [];
+  for (const applicant of arr) {
+    if (!applicant.name) {
+      alert('Please fill in all applicant names before saving.');
+      return;
+    }
+  }
+  // Save or update each applicant
+  for (const applicant of arr) {
+    try {
+      if (applicant._id) {
+        // Update by delete + add workaround or implement PATCH
+        // For simplicity, delete old and post new (not ideal)
+        await deleteApplicantFromServer(applicant._id);
+        delete applicant._id;
+      }
+      await saveApplicantToServer(applicant);
+    } catch (e) {
+      console.error('Error saving applicant:', e);
+      alert('Error saving some applicants.');
+    }
+  }
+  alert('All applicants saved!');
+  await loadFromServer();
+  renderProfiles();
+}
+
+// Clear all data for current date
+function clearAllData() {
+  if (!selectedCategory || !selectedYear || !selectedMonth || !selectedDate) {
+    alert('Select Category, Year, Month and Date first');
+    return;
+  }
+  if (confirm('Clear all applicant data for this date?')) {
+    interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate] = [];
+    renderProfiles();
+  }
+}
+
+// Handle Add Date button
+const addDateBtn = document.getElementById('addDateBtn');
+const dateInput = document.getElementById('dateInput');
+
+addDateBtn.onclick = () => {
+  const val = dateInput.value.trim();
+  if (!val.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    alert('Please enter a valid date in YYYY-MM-DD format.');
+    return;
+  }
+  selectedDate = val;
+  updateBreadcrumb();
+  renderProfiles();
+  dateInput.value = '';
+};
+
+// Add event listeners
+addMoreBtn.onclick = addNewApplicant;
+clearBtn.onclick = clearAllData;
+logoutBtn.onclick = () => {
+  localStorage.removeItem('token');
+  window.location.href = 'admin.html';
+};
+
+// Initial load
+loadFromServer();
+
 </script>
+
 </body>
 </html>
