@@ -57,21 +57,41 @@ h3.subheading { padding-bottom: 30px; }
 }
 
 .added-date {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   background: #66ccff;
   color: #004a99;
-  padding: 4px 8px;
+  padding: 10px 16px;
   margin: 4px;
-  border-radius: 6px;
-  cursor: default;
-}
-.added-date span {
-  margin-left: 6px;
-  font-weight: bold;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
-  font-size: 12px; /* smaller */
-  color: red;      /* red */
+  user-select: none;
+  border: none;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
+
+.added-date:hover {
+  background: #004a99;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 74, 153, 0.3);
+  transform: scale(1.05);
+}
+
+.added-date .date-text {
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.added-date .remove-cross {
+  font-weight: 700;
+  font-size: 12px;
+  color: red;
+  cursor: pointer;
+  user-select: none;
+}
+
 
 .profiles-wrapper { display: flex; flex-wrap: wrap; justify-content: flex-start; margin-top: 20px; }
 .profile-container { background: #ffffff; border-radius: 8px; padding: 12px; margin: 5px; width: 300px; text-align: left; font-size: 12px; box-shadow: 2px 2px 8px #cbd8e6, -2px -2px 8px #f7faff; }
@@ -517,3 +537,4 @@ loadFromServer();
 </script>
 </body>
 </html>
+
