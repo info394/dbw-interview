@@ -158,6 +158,7 @@ function createApplicantDiv(app){
         <option ${app.status==='Hold'?'selected':''}>Hold</option>
       </select>
     </td></tr>
+    <tr><td class="label">Notes:</td><td><textarea class="notes-input" style="width:95%; border-radius:4px; padding:4px;">${app.notes||''}</textarea></td></tr>
   `;
   div.appendChild(table);
   return div;
@@ -171,9 +172,13 @@ addMoreBtn.onclick = ()=>{
   addMoreBtn.style.display='block';
 };
 
+  const notes = profile.querySelector('textarea.notes-input').value;
+
+
 // ----------- INITIAL -------------
 renderCategories();
 </script>
 
 </body>
 </html>
+
