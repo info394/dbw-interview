@@ -12,25 +12,29 @@
       margin: 0;
       text-align: center;
     }
+
     h1 {
       color: #004a99;
       margin-bottom: 10px;
     }
-    h2.subheading,
-    h3.subheading {
+
+    h2.subheading, h3.subheading {
       color: #004a99;
       font-weight: 400;
       margin: 5px 0;
       font-size: 18px;
     }
+
     h3.subheading {
       padding-bottom: 30px;
     }
+
     #breadcrumb {
       margin: 10px 0;
       font-size: 14px;
       color: #004a99;
     }
+
     .btn {
       padding: 14px 22px;
       margin: 5px;
@@ -41,34 +45,42 @@
       cursor: pointer;
       transition: 0.3s;
     }
+
     .btn-category {
       background: #004a99;
       color: white;
     }
+
     .btn-year,
     .btn-month {
       background: #0066cc;
       color: white;
     }
+
     .btn-date {
       background: #66ccff;
       color: white;
     }
+
     .btn-active {
       background: white !important;
       color: #004a99 !important;
       border: 1px solid #004a99;
     }
+
     .btn:hover {
       opacity: 0.8;
     }
+
     .section {
       margin-top: 20px;
       display: none;
     }
+
     .date-input-container {
       margin-top: 20px;
     }
+
     .date-input {
       padding: 6px;
       width: 150px;
@@ -76,48 +88,42 @@
       margin-right: 6px;
     }
 
-    /* Hover effect for all buttons */
-.btn:hover {
-  opacity: 0.85;
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 74, 153, 0.3);
-}
-
-.section { margin-top: 20px; display: none; }
-.date-input-container { margin-top: 20px; }
-.date-input { padding: 6px; width: 150px; font-size: 14px; margin-right: 6px; }
-    .profile-title {
-  font-weight: 600;
+    .added-date {
+  display: inline-flex;
+  align-items: center;
+  background: #66ccff;
   color: #004a99;
-  margin-bottom: 6px;
-  text-align: left;      /* changed from center */
-  padding-left: 2px;     /* added */
-}
-
-#addDateBtn {
-  background: linear-gradient(135deg, #007bff, #004a99);
-  box-shadow: 0 4px 8px rgba(0, 74, 153, 0.4);
-  border-radius: 12px;
-  padding: 14px 22px;
-  color: white;
+  padding: 10px 16px;
+  margin: 4px;
+  border-radius: 10px;
   font-weight: 600;
   font-size: 16px;
   cursor: pointer;
+  user-select: none;
   border: none;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-}
-#addDateBtn:hover {
-  background: linear-gradient(135deg, #0056b3, #003366);
-  box-shadow: 0 6px 12px rgba(0, 74, 153, 0.6);
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
-.added-date span {
-  margin-left: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 2px;         /* smaller */
-  color: red;              /* red color */
+.added-date:hover {
+  background: #004a99;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 74, 153, 0.3);
+  transform: scale(1.05);
 }
+
+.added-date .date-text {
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.added-date .remove-cross {
+  font-weight: 700;
+  font-size: 12px;
+  color: red;
+  cursor: pointer;
+  user-select: none;
+}
+
 
     .profiles-wrapper {
       display: flex;
@@ -125,6 +131,7 @@
       justify-content: flex-start;
       margin-top: 20px;
     }
+
     .profile-container {
       background: #ffffff;
       border-radius: 8px;
@@ -135,25 +142,30 @@
       font-size: 12px;
       box-shadow: 2px 2px 8px #cbd8e6, -2px -2px 8px #f7faff;
     }
+
     .profile-title {
       font-weight: 600;
       color: #004a99;
       margin-bottom: 6px;
       text-align: center;
     }
+
     .profile-table {
       width: 100%;
       border-collapse: collapse;
     }
+
     .profile-table td {
       padding: 4px 6px;
     }
+
     .label {
       width: 40%;
       font-weight: 500;
       color: #004a99;
       text-align: left;
     }
+
     .editable {
       background-color: #f7faff;
       border-radius: 4px;
@@ -162,11 +174,13 @@
       border: 1px solid transparent;
       display: inline-block;
     }
+
     .editable:focus {
       border: 1px solid #ff944d;
       outline: none;
       background-color: #fffefc;
     }
+
     select {
       padding: 4px 6px;
       border-radius: 6px;
@@ -176,6 +190,7 @@
       color: white;
       width: 100%;
     }
+
     .time-input {
       background: yellow;
       width: 95%;
@@ -184,9 +199,11 @@
       border: none;
       color: black;
     }
+
     #addMoreBtn {
       margin-top: 10px;
     }
+
     #saveBtn,
     #clearBtn,
     #logoutBtn {
@@ -198,13 +215,16 @@
       border: none;
       color: white;
     }
+
     #saveBtn {
       background: #004a99;
     }
+
     #clearBtn {
       background: #cc3300;
       margin-left: 10px;
     }
+
     #logoutBtn {
       background: #666666;
       margin-left: 10px;
@@ -212,6 +232,7 @@
   </style>
 </head>
 <body>
+
   <h1>Applicant Profiles</h1>
   <h2 class="subheading">DBW CORPORATION LLC</h2>
   <h3 class="subheading">Manage and Review Applicant Details</h3>
@@ -220,9 +241,10 @@
   <div id="categoryContainer"></div>
   <div id="yearContainer" class="section"></div>
   <div id="monthContainer" class="section"></div>
+
   <div id="dateContainer" class="section">
     <div class="date-input-container">
-      <input type="text" placeholder="Enter Date (YYYY-MM-DD)" id="dateInput" class="date-input">
+      <input type="text" placeholder="Enter Date:" id="dateInput" class="date-input">
       <button id="addDateBtn" class="btn btn-month">Add Date</button>
     </div>
     <div id="addedDates" style="margin-top:10px;"></div>
@@ -236,11 +258,292 @@
   <button id="logoutBtn">Logout</button>
 
   <script>
-    // All JavaScript remains the same, properly formatted.
-    // Due to message size, the script block is already long.
-    // Would you like me to split the JS separately for clarity?
+    // CHECK ADMIN LOGIN
+    if (!localStorage.getItem("token")) {
+      window.location.href = "admin.html";
+    }
 
-    // Just let me know and I can deliver it in chunks or export.
+    // API URL
+    const API_URL = 'https://dbw-interview.onrender.com/api/applicants';
+
+    const categories = ["PETRA", "KEDMA", "Logistics Manager", "Logistics Assistant", "Carpenter", "Operations Supervisor", "Electrician"];
+    const years = ["2025", "2026"];
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const nationalities = ["Algerian", "Bhutanese", "Cambodia", "Cameroonian", "Chad", "Colombian", "Congo", "Ethiopian", "Filipina", "Gabonese", "Ghana", "Guinean", "Indian", "Indonesian", "Ivorian", "Kenyan", "Myanmar", "Nepalese", "Nigerian", "South African", "Sierra Leone", "Sri Lankan", "Tanzanian", "Ugandan", "Zimbabwe"];
+    const educationList = ["Master's", "Bachelor's", "Bachelor's Diploma", "High School", "College Diploma", "College", "College Undergraduate", "High School Diploma", "Diploma", "Certificate", "University"];
+
+    let interviewData = {};
+
+    const categoryContainer = document.getElementById("categoryContainer");
+    const yearContainer = document.getElementById("yearContainer");
+    const monthContainer = document.getElementById("monthContainer");
+    const dateContainer = document.getElementById("dateContainer");
+    const addedDatesDiv = document.getElementById("addedDates");
+    const profilesWrapper = document.getElementById("profilesWrapper");
+    const breadcrumbDiv = document.getElementById("breadcrumb");
+    const addMoreBtn = document.getElementById("addMoreBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    let selectedCategory = null, selectedYear = null, selectedMonth = null, selectedDate = null;
+
+    async function loadFromServer() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+
+        interviewData = {};
+
+        data.forEach(item => {
+          if (!interviewData[item.category]) interviewData[item.category] = {};
+          if (!interviewData[item.category][item.year]) interviewData[item.category][item.year] = {};
+          if (!interviewData[item.category][item.year][item.month]) interviewData[item.category][item.year][item.month] = {};
+          if (!interviewData[item.category][item.year][item.month][item.date]) interviewData[item.category][item.year][item.month][item.date] = [];
+          interviewData[item.category][item.year][item.month][item.date].push(item);
+        });
+
+        renderCategories();
+      } catch (err) {
+        console.error('Error fetching applicants:', err);
+        alert('Cannot load applicants. Check backend URL and CORS.');
+        renderCategories();
+      }
+    }
+
+    async function saveApplicantToServer(applicant) {
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(applicant)
+      });
+    }
+
+    async function deleteApplicantFromServer(id) {
+      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    }
+
+    function updateBreadcrumb() {
+      const crumbs = [];
+      if (selectedCategory) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('category')">${selectedCategory}</span>`);
+      if (selectedYear) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('year')">${selectedYear}</span>`);
+      if (selectedMonth) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('month')">${selectedMonth}</span>`);
+      if (selectedDate) crumbs.push(`<span style="cursor:pointer;" onclick="goBack('date')">${selectedDate}</span>`);
+      breadcrumbDiv.innerHTML = crumbs.join(" > ");
+    }
+
+    function goBack(level) {
+      if (level === 'category') {
+        selectedCategory = selectedYear = selectedMonth = selectedDate = null;
+      } else if (level === 'year') {
+        selectedYear = selectedMonth = selectedDate = null;
+      } else if (level === 'month') {
+        selectedMonth = selectedDate = null;
+      } else if (level === 'date') {
+        selectedDate = null;
+      }
+
+      profilesWrapper.innerHTML = '';
+      addMoreBtn.style.display = 'none';
+      yearContainer.style.display = monthContainer.style.display = dateContainer.style.display = 'none';
+      addedDatesDiv.innerHTML = '';
+
+      renderCategories();
+      if (selectedCategory) renderYears();
+      if (selectedYear) renderMonths();
+      updateBreadcrumb();
+    }
+
+    function renderCategories() {
+      categoryContainer.innerHTML = '';
+      categories.forEach(c => {
+        const btn = document.createElement('button');
+        btn.textContent = c;
+        btn.className = 'btn btn-category';
+        btn.onclick = () => {
+          selectedCategory = c;
+          yearContainer.style.display = 'block';
+          renderYears();
+          updateBreadcrumb();
+        };
+        categoryContainer.appendChild(btn);
+      });
+    }
+
+    function renderYears() {
+      yearContainer.innerHTML = '';
+      years.forEach(y => {
+        const btn = document.createElement('button');
+        btn.textContent = y;
+        btn.className = 'btn btn-year';
+        btn.onclick = () => {
+          selectedYear = y;
+          monthContainer.style.display = 'block';
+          renderMonths();
+          updateBreadcrumb();
+        };
+        yearContainer.appendChild(btn);
+      });
+    }
+
+    function renderMonths() {
+      monthContainer.innerHTML = '';
+      months.forEach(m => {
+        const btn = document.createElement('button');
+        btn.textContent = m;
+        btn.className = 'btn btn-month';
+        btn.onclick = () => {
+          selectedMonth = m;
+          dateContainer.style.display = 'block';
+          updateBreadcrumb();
+        };
+        monthContainer.appendChild(btn);
+      });
+    }
+
+    function renderAddedDate() {
+      addedDatesDiv.innerHTML = '';
+      if (selectedDate) {
+        const dateBox = document.createElement('div');
+        dateBox.className = 'added-date';
+        dateBox.textContent = selectedDate;
+
+        const delSpan = document.createElement('span');
+        delSpan.textContent = '✕';
+        delSpan.onclick = () => {
+          selectedDate = null;
+          profilesWrapper.innerHTML = '';
+          addMoreBtn.style.display = 'none';
+          renderAddedDate();
+          updateBreadcrumb();
+        };
+
+        dateBox.appendChild(delSpan);
+        addedDatesDiv.appendChild(dateBox);
+      }
+    }
+
+    document.getElementById('addDateBtn').onclick = () => {
+      const dateVal = document.getElementById('dateInput').value.trim();
+      if (!dateVal) {
+        alert('Enter a date (YYYY-MM-DD)');
+        return;
+      }
+      selectedDate = dateVal;
+      addMoreBtn.style.display = 'block';
+      profilesWrapper.innerHTML = '';
+      renderAddedDate();
+      updateBreadcrumb();
+    };
+
+    function createApplicantDiv(applicant) {
+      const div = document.createElement('div');
+      div.className = 'profile-container';
+
+      div.innerHTML = `
+        <div class="profile-title">Applicant (${selectedDate || ''})</div>
+        <table class="profile-table">
+          <tr><td class="label">Name:</td><td><span class="editable" contenteditable="true">${applicant.name || ''}</span></td></tr>
+          <tr><td class="label">Visa:</td><td><span class="editable" contenteditable="true">${applicant.visa || ''}</span></td></tr>
+          <tr><td class="label">Nationality:</td><td><select class="nationality-select">${nationalities.map(n => `<option ${applicant.nationality === n ? 'selected' : ''}>${n}</option>`)}</select></td></tr>
+          <tr><td class="label">Salary:</td><td><span class="editable" contenteditable="true">${applicant.salary || ''}</span></td></tr>
+          <tr><td class="label">Education:</td><td><select class="education-select">${educationList.map(e => `<option ${applicant.education === e ? 'selected' : ''}>${e}</option>`)}</select></td></tr>
+          <tr><td class="label">Contact:</td><td><span class="editable" contenteditable="true">${applicant.contact || ''}</span></td></tr>
+          <tr><td class="label">Email:</td><td><span class="editable" contenteditable="true">${applicant.email || ''}</span></td></tr>
+          <tr><td class="label">Time:</td><td><input type="time" class="time-input" value="${applicant.time || ''}"></td></tr>
+          <tr><td class="label">Status:</td><td>
+            <select class="status-select">
+              <option ${applicant.status === 'Accepted' ? 'selected' : ''}>Accepted</option>
+              <option ${applicant.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+              <option ${applicant.status === 'Did Not Show Up' ? 'selected' : ''}>Did Not Show Up</option>
+              <option ${!['Accepted','Rejected','Did Not Show Up'].includes(applicant.status) ? 'selected' : ''}>Pending</option>
+            </select>
+          </td></tr>
+        </table>
+        <div style="text-align:center;margin-top:6px;">
+          <button class="btn btn-month save-btn">Save</button>
+          <button class="btn btn-month remove-btn" style="background:#cc3300;">Remove</button>
+        </div>
+      `;
+
+      div.querySelector('.save-btn').onclick = async () => {
+        const editable = div.querySelectorAll('span.editable');
+        const updated = {
+          id: applicant.id,
+          name: editable[0].textContent,
+          visa: editable[1].textContent,
+          nationality: div.querySelector('.nationality-select').value,
+          salary: editable[2].textContent,
+          education: div.querySelector('.education-select').value,
+          contact: editable[3].textContent,
+          email: editable[4].textContent,
+          time: div.querySelector('.time-input').value,
+          status: div.querySelector('.status-select').value,
+          category: selectedCategory,
+          year: selectedYear,
+          month: selectedMonth,
+          date: selectedDate
+        };
+        await saveApplicantToServer(updated);
+        alert('Applicant saved!');
+        loadFromServer();
+      };
+
+      div.querySelector('.remove-btn').onclick = async () => {
+        if (applicant.id) await deleteApplicantFromServer(applicant.id);
+        div.remove();
+      };
+
+      return div;
+    }
+
+    addMoreBtn.onclick = () => {
+      const newApp = {
+        category: selectedCategory,
+        year: selectedYear,
+        month: selectedMonth,
+        date: selectedDate
+      };
+      const div = createApplicantDiv(newApp);
+      profilesWrapper.appendChild(div);
+    };
+
+    document.getElementById('saveBtn').onclick = async () => {
+      const allDivs = profilesWrapper.querySelectorAll('.profile-container');
+      for (let div of allDivs) {
+        const editable = div.querySelectorAll('span.editable');
+        const updated = {
+          name: editable[0].textContent,
+          visa: editable[1].textContent,
+          nationality: div.querySelector('.nationality-select').value,
+          salary: editable[2].textContent,
+          education: div.querySelector('.education-select').value,
+          contact: editable[3].textContent,
+          email: editable[4].textContent,
+          time: div.querySelector('.time-input').value,
+          status: div.querySelector('.status-select').value,
+          category: selectedCategory,
+          year: selectedYear,
+          month: selectedMonth,
+          date: selectedDate
+        };
+        await saveApplicantToServer(updated);
+      }
+      alert('All applicants saved!');
+      loadFromServer();
+    };
+
+    clearBtn.onclick = () => {
+      if (confirm("Are you sure you want to clear all profiles on this page?")) {
+        profilesWrapper.innerHTML = '';
+      }
+    };
+
+    logoutBtn.onclick = () => {
+      localStorage.removeItem("token");
+      window.location.href = "admin.html";
+    };
+
+    loadFromServer();
   </script>
 </body>
 </html>
