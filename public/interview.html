@@ -480,10 +480,6 @@ function addNewApplicant() {
 function addDate() {
   const dateInput = document.getElementById("dateInput");
   const val = dateInput.value.trim();
-  if(!val.match(/^\d{4}-\d{2}-\d{2}$/)) {
-    alert("Date must be in format YYYY-MM-DD");
-    return;
-  }
   if(!interviewData[selectedCategory]) interviewData[selectedCategory] = {};
   if(!interviewData[selectedCategory][selectedYear]) interviewData[selectedCategory][selectedYear] = {};
   if(!interviewData[selectedCategory][selectedYear][selectedMonth]) interviewData[selectedCategory][selectedYear][selectedMonth] = {};
@@ -537,4 +533,5 @@ loadFromServer();
 </script>
 </body>
 </html>
+
 
