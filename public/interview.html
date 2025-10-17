@@ -12,7 +12,23 @@ h2.subheading, h3.subheading { color: #004a99; font-weight: 400; margin: 5px 0; 
 h3.subheading { padding-bottom: 30px; }
 #breadcrumb { margin: 10px 0; font-size:14px; color:#004a99; }
 /* 🔹 BUTTONS */
-.btn { padding: 14px 22px; margin: 5px; font-size: 16px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: 0.3s; }
+.btn {
+  padding: 14px 22px;
+  margin: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(0, 74, 153, 0.3);
+  transform: translateY(-2px);
+}
+
 .btn-category { background: #004a99; color: white; }
 .btn-year, .btn-month { background: #0066cc; color: white; }
 .btn-date { background: #66ccff; color: white; }
@@ -30,6 +46,7 @@ h3.subheading { padding-bottom: 30px; }
 .editable:focus { border: 1px solid #ff944d; outline: none; background-color: #fffefc; }
 select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; background:rgb(0, 153, 255); color:white; width:100%; }
 .time-input { background:yellow; width:95%; padding:4px; border-radius:4px; border:none; color:black; }
+  
 #addMoreBtn { margin-top: 10px; }
 #saveBtn, #clearBtn, #logoutBtn { margin-top: 20px; padding: 10px 20px; font-size: 14px; cursor: pointer; border-radius: 8px; border:none; color:white; }
 #saveBtn { background:#004a99; }
@@ -136,3 +153,4 @@ window.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
+
