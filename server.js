@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
@@ -10,17 +9,17 @@ app.use(express.json());
 
 // MySQL connection
 const db = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: 'irish1234',
-  database: 'interview_system'
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE
 });
 
-// Dummy admin credentials (you can replace with DB login later)
+// Dummy admin credentials
 const ADMIN_USER = "admin";
 const ADMIN_PASS = "Petra@2025";
 
-// ✅ LOGIN ROUTE
+// LOGIN ROUTE
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   if (username === ADMIN_USER && password === ADMIN_PASS) {
@@ -30,7 +29,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// ✅ GET ALL APPLICANTS
+// GET ALL APPLICANTS
 app.get('/api/applicants', async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM applicants');
@@ -41,7 +40,7 @@ app.get('/api/applicants', async (req, res) => {
   }
 });
 
-// ✅ ADD OR UPDATE APPLICANT
+// ADD OR UPDATE APPLICANT
 app.post('/api/applicants', async (req, res) => {
   try {
     const a = req.body;
@@ -65,7 +64,7 @@ app.post('/api/applicants', async (req, res) => {
   }
 });
 
-// ✅ DELETE APPLICANT
+// DELETE APPLICANT
 app.delete('/api/applicants/:id', async (req, res) => {
   try {
     const id = req.params.id;
@@ -77,19 +76,19 @@ app.delete('/api/applicants/:id', async (req, res) => {
   }
 });
 
-// ✅ SERVE FRONTEND FILES (from /public)
+// SERVE FRONTEND FILES (from /public)
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Default route (for browser)
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// Fallback for unmatched routes (so it doesn’t show “Not Found”)
+// Fallback for unmatched routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// ✅ START SERVER
+// START SERVER
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
