@@ -53,29 +53,28 @@ button:hover { opacity: 0.85; }
 <script>
 const API_URL = '/api/login';
 
-window.addEventListener("DOMContentLoaded", () => {
-
-  // Redirect if token exists
-  const token = localStorage.getItem("token");
-  if (token) {
-    window.location.href = "interview.html";
-    return;
-  }
-
+document.addEventListener("DOMContentLoaded", () => {
   const usernameInput = document.getElementById("username");
   const passwordInput = document.getElementById("password");
   const loginBtn = document.getElementById("loginBtn");
   const errorMsg = document.getElementById("errorMsg");
 
-  usernameInput.focus();
+  // Only redirect if a valid token exists
+  const token = localStorage.getItem("token");
+  if(token) {
+    window.location.href = "interview.html";
+    return;
+  }
+
+  function clearError() { errorMsg.textContent = ""; }
 
   async function login() {
+    clearError();
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
-    errorMsg.innerText = "";
 
-    if (!username || !password) {
-      errorMsg.innerText = "Please enter both username and password.";
+    if(!username || !password) {
+      errorMsg.textContent = "Please enter both username and password.";
       return;
     }
 
@@ -86,28 +85,31 @@ window.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ username, password })
       });
 
-      if (!res.ok) throw new Error('Network response not ok');
+      if(!res.ok) throw new Error("Network error");
 
       const data = await res.json();
 
-      if (data.success) {
+      if(data.success) {
         localStorage.setItem("token", data.token);
         window.location.href = "interview.html";
       } else {
-        errorMsg.innerText = "Invalid credentials.";
+        errorMsg.textContent = "Invalid credentials.";
       }
 
-    } catch (err) {
+    } catch(err) {
       console.error(err);
-      errorMsg.innerText = "Server error, please try again later.";
+      errorMsg.textContent = "Server error, please try again later.";
     }
   }
 
   loginBtn.addEventListener("click", login);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") login();
-  });
 
+  // Only trigger login on Enter if focus is inside inputs
+  [usernameInput, passwordInput].forEach(input => {
+    input.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") login();
+    });
+  });
 });
 </script>
 
