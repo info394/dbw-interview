@@ -13,26 +13,8 @@ h3.subheading { padding-bottom: 30px; }
 .btn { padding: 14px 22px; margin: 5px; font-size: 16px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: 0.3s; }
 .btn-category { background: #004a99; color: white; }
 .btn-year, .btn-month { background: #0066cc; color: white; }
-.btn-date { 
-  position: relative;
-  background: #66ccff;
-  color: white;
-  border-radius: 12px;
-  margin: 5px;
-  padding: 10px 20px;
-  display: inline-block;
-}
-.date-x {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: red;
-  color: white;
-  border-radius: 50%;
-  font-size: 10px;
-  padding: 2px 5px;
-  cursor: pointer;
-}
+.btn-date { position: relative; background: #66ccff; color: white; border-radius: 12px; margin: 5px; padding: 10px 20px; display: inline-block; }
+.date-x { position: absolute; top: -6px; right: -6px; background: red; color: white; border-radius: 50%; font-size: 10px; padding: 2px 5px; cursor: pointer; }
 .btn-active { background: white !important; color: #004a99 !important; border: 1px solid #004a99; }
 .btn:hover { opacity: 0.8; }
 .section { margin-top: 20px; display: none; }
@@ -53,6 +35,12 @@ select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; backg
 #saveBtn, #clearBtn { margin-top: 20px; padding: 10px 20px; font-size: 14px; cursor: pointer; border-radius: 8px; border:none; color:white; }
 #saveBtn { background:#004a99; }
 #clearBtn { background:#cc3300; margin-left: 10px; }
+.save-remove-btns { margin-top: 8px; text-align: right; }
+.save-btn { background:#004a99; color:white; border:none; padding:5px 8px; border-radius:5px; font-size:12px; cursor:pointer; margin-right:4px; }
+.remove-btn { background:#cc3300; color:white; border:none; padding:5px 8px; border-radius:5px; font-size:12px; cursor:pointer; }
+.search-bar { margin-top: 20px; }
+.search-input { padding:8px; width:250px; border-radius:8px; border:1px solid #ccc; }
+.search-btn { background:#004a99; color:white; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; margin-left:5px; }
 </style>
 </head>
 <body>
@@ -62,6 +50,12 @@ select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; backg
 <h3 class="subheading">Manage and Review Applicant Details</h3>
 
 <div id="breadcrumb"></div>
+
+<div class="search-bar">
+  <input type="text" id="searchInput" class="search-input" placeholder="Search applicant...">
+  <button id="searchBtn" class="search-btn">Search</button>
+</div>
+
 <div id="categoryContainer"></div>
 <div id="yearContainer" class="section"></div>
 <div id="monthContainer" class="section"></div>
@@ -159,7 +153,7 @@ function renderMonths(){
   });
 }
 
-// ✅ Add date button logic
+// Add date button logic
 document.getElementById('addDateBtn').onclick=()=>{
   const dateVal=document.getElementById('dateInput').value.trim();
   if(!dateVal){ alert('Enter a date'); return; }
@@ -180,20 +174,15 @@ document.getElementById('addDateBtn').onclick=()=>{
     profilesWrapper.innerHTML='';
     updateBreadcrumb();
 
-    if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear] &&
-       interviewData[selectedCategory][selectedYear][selectedMonth] &&
-       interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]){
-         interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate].forEach(a=>{
-           profilesWrapper.appendChild(createApplicantDiv(a));
-         });
-    }
+    const list=interviewData[selectedCategory]?.[selectedYear]?.[selectedMonth]?.[selectedDate] || [];
+    list.forEach(a=>profilesWrapper.appendChild(createApplicantDiv(a)));
   };
 
   document.getElementById('dateButtonsContainer').appendChild(dateBtn);
   document.getElementById('dateInput').value='';
 };
 
-// ✅ Create applicant card
+// Create applicant card
 function createApplicantDiv(app){
   const div=document.createElement('div');
   div.className='profile-container';
@@ -211,16 +200,66 @@ function createApplicantDiv(app){
       <tr><td class="label">Status:</td><td><select class="status-select"><option>Accepted</option><option>Rejected</option><option>Hold</option></select></td></tr>
       <tr><td class="label">Notes:</td><td><textarea class="notes-input">${app.notes||''}</textarea></td></tr>
     </table>
+    <div class="save-remove-btns">
+      <button class="save-btn">Save</button>
+      <button class="remove-btn">Remove</button>
+    </div>
   `;
   div.querySelector('.status-select').value=app.status||'Accepted';
+
+  // Save single applicant
+  div.querySelector('.save-btn').onclick=()=>{
+    const data=extractApplicantData(div);
+    alert(`Saved ${data.name||'Unnamed'} successfully.`);
+  };
+
+  // Remove applicant
+  div.querySelector('.remove-btn').onclick=()=>{
+    if(confirm('Remove this applicant?')) div.remove();
+  };
+
   return div;
 }
 
-// ✅ Add more applicant — no dialog
+function extractApplicantData(div){
+  return {
+    name: div.querySelectorAll('.editable')[0].textContent.trim(),
+    visa: div.querySelectorAll('.editable')[1].textContent.trim(),
+    nationality: div.querySelector('.nationality-select').value,
+    salary: div.querySelectorAll('.editable')[2].textContent.trim(),
+    education: div.querySelector('.education-select').value,
+    contact: div.querySelectorAll('.editable')[3].textContent.trim(),
+    email: div.querySelectorAll('.editable')[4].textContent.trim(),
+    time: div.querySelector('.time-input').value,
+    status: div.querySelector('.status-select').value,
+    notes: div.querySelector('.notes-input').value
+  };
+}
+
+// Add more applicant
 addMoreBtn.onclick=()=>{
   if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate) return;
   const newApp={category:selectedCategory,year:selectedYear,month:selectedMonth,date:selectedDate};
   profilesWrapper.appendChild(createApplicantDiv(newApp));
+};
+
+// Search functionality
+document.getElementById('searchBtn').onclick=()=>{
+  const query=document.getElementById('searchInput').value.toLowerCase();
+  if(!query) return;
+  profilesWrapper.innerHTML='';
+  Object.values(interviewData).forEach(y=>{
+    Object.values(y).forEach(m=>{
+      Object.values(m).forEach(d=>{
+        Object.values(d).forEach(list=>{
+          list.forEach(app=>{
+            const values=Object.values(app).join(' ').toLowerCase();
+            if(values.includes(query)) profilesWrapper.appendChild(createApplicantDiv(app));
+          });
+        });
+      });
+    });
+  });
 };
 
 loadFromServer();
