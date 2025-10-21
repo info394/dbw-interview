@@ -5,57 +5,66 @@
 <title>INTERVIEW | Applicant Profiles</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
-body { font-family: 'Poppins', sans-serif; background: #e0eafc; padding: 20px; margin: 0; text-align: center; }
+body { font-family: 'Poppins', sans-serif; background: #e0eafc; padding: 20px; margin: 0; text-align: center; position: relative; }
 h1 { color: #004a99; margin-bottom: 10px; }
 h2.subheading, h3.subheading { color: #004a99; font-weight: 400; margin: 5px 0; font-size: 18px; }
 h3.subheading { padding-bottom: 30px; }
 #breadcrumb { margin: 10px 0; font-size:14px; color:#004a99; }
+
 .btn { padding: 14px 22px; margin: 5px; font-size: 16px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: 0.3s; }
 .btn-category { background: #004a99; color: white; }
 .btn-year, .btn-month { background: #0066cc; color: white; }
 .btn-date { position: relative; background: #66ccff; color: white; border-radius: 12px; margin: 5px; padding: 10px 20px; display: inline-block; }
 .date-x { position: absolute; top: -6px; right: -6px; background: red; color: white; border-radius: 50%; font-size: 10px; padding: 2px 5px; cursor: pointer; }
-.btn-active { background: white !important; color: #004a99 !important; border: 1px solid #004a99; }
 .btn:hover { opacity: 0.8; }
+
 .section { margin-top: 20px; display: none; }
 .date-input-container { margin-top: 20px; }
 .date-input { padding: 6px; width: 150px; font-size: 14px; margin-right: 6px; }
+
 .profiles-wrapper { display: flex; flex-wrap: wrap; justify-content: flex-start; margin-top: 20px; }
 .profile-container { background: #ffffff; border-radius: 8px; padding: 12px; margin: 5px; width: 300px; text-align: left; font-size: 12px; box-shadow: 2px 2px 8px #cbd8e6, -2px -2px 8px #f7faff; position: relative; }
 .profile-label { font-weight: 600; color: #004a99; margin-bottom: 8px; font-size: 14px; }
+
 .profile-table { width: 100%; border-collapse: collapse; }
 .profile-table td { padding: 4px 6px; }
 .label { width: 40%; font-weight: 500; color: #004a99; text-align: left; }
+
 .editable { background-color: #f7faff; border-radius: 4px; padding: 4px 6px; width:95%; border: 1px solid transparent; display:inline-block; }
 .editable:focus { border: 1px solid #ff944d; outline: none; background-color: #fffefc; }
+
 select { padding: 4px 6px; border-radius:6px; border:none; cursor:pointer; background:rgb(0, 153, 255); color:white; width:100%; }
 .time-input { background:yellow; width:95%; padding:4px; border-radius:4px; border:none; color:black; }
 .notes-input { width:95%; border-radius:4px; padding:4px; border:1px solid #ccc; resize:vertical; min-height:40px; }
+
+.save-btn, .remove-btn {
+  margin-top: 6px; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer;
+  color: white; font-size: 12px; font-weight: 600;
+}
+.save-btn { background: #004a99; }
+.remove-btn { background: #cc3300; margin-left: 6px; }
+
 #addMoreBtn { margin-top: 10px; }
 #saveBtn, #clearBtn { margin-top: 20px; padding: 10px 20px; font-size: 14px; cursor: pointer; border-radius: 8px; border:none; color:white; }
 #saveBtn { background:#004a99; }
 #clearBtn { background:#cc3300; margin-left: 10px; }
-.save-remove-btns { margin-top: 8px; text-align: right; }
-.save-btn { background:#004a99; color:white; border:none; padding:5px 8px; border-radius:5px; font-size:12px; cursor:pointer; margin-right:4px; }
-.remove-btn { background:#cc3300; color:white; border:none; padding:5px 8px; border-radius:5px; font-size:12px; cursor:pointer; }
-.search-bar { margin-top: 20px; }
-.search-input { padding:8px; width:250px; border-radius:8px; border:1px solid #ccc; }
-.search-btn { background:#004a99; color:white; padding:8px 14px; padding bottom: 20px; border:none; border-radius:8px; cursor:pointer; margin-left:5px; }
+
+#searchContainer { position: absolute; top: 20px; right: 20px; }
+#searchInput { padding:6px; width:200px; border-radius:6px; border:1px solid #ccc; }
 </style>
 </head>
 <body>
+
+<div id="searchContainer">
+  <input type="text" id="searchInput" placeholder="Search applicant...">
+  <button id="searchBtn" class="btn btn-category">Search</button>
+</div>
 
 <h1>Applicant Profiles</h1>
 <h2 class="subheading">DBW CORPORATION LLC</h2>
 <h3 class="subheading">Manage and Review Applicant Details</h3>
 
 <div id="breadcrumb"></div>
-
-<div class="search-bar">
-  <input type="text" id="searchInput" class="search-input" placeholder="Search applicant...">
-  <button id="searchBtn" class="search-btn">Search</button>
-</div>
-
 <div id="categoryContainer"></div>
 <div id="yearContainer" class="section"></div>
 <div id="monthContainer" class="section"></div>
@@ -89,7 +98,16 @@ const dateContainer=document.getElementById("dateContainer");
 const profilesWrapper=document.getElementById("profilesWrapper");
 const breadcrumbDiv=document.getElementById("breadcrumb");
 const addMoreBtn=document.getElementById("addMoreBtn");
-const clearBtn=document.getElementById("clearBtn");
+
+// 🔍 Search function
+document.getElementById("searchBtn").onclick=()=>{
+  const query=document.getElementById("searchInput").value.toLowerCase();
+  const cards=document.querySelectorAll(".profile-container");
+  cards.forEach(c=>{
+    const text=c.innerText.toLowerCase();
+    c.style.display=text.includes(query)?"block":"none";
+  });
+};
 
 async function loadFromServer(){
   try{
@@ -126,11 +144,28 @@ function goBack(level){
   renderCategories(); if(selectedCategory) renderYears(); if(selectedYear) renderMonths(); updateBreadcrumb();
 }
 
+// ✅ Category toggle logic
 function renderCategories(){
   categoryContainer.innerHTML='';
   categories.forEach(c=>{
-    const b=document.createElement('button'); b.textContent=c; b.className='btn btn-category';
-    b.onclick=()=>{ selectedCategory=c; yearContainer.style.display='block'; renderYears(); updateBreadcrumb(); };
+    const b=document.createElement('button');
+    b.textContent=c;
+    b.className='btn btn-category';
+    b.onclick=()=>{
+      if(selectedCategory===c){
+        selectedCategory=null;
+        yearContainer.style.display='none';
+        categoryContainer.querySelectorAll('.btn').forEach(btn=>btn.style.display='inline-block');
+      } else {
+        selectedCategory=c;
+        yearContainer.style.display='block';
+        renderYears();
+        categoryContainer.querySelectorAll('.btn').forEach(btn=>{
+          btn.style.display = btn.textContent===c ? 'inline-block' : 'none';
+        });
+      }
+      updateBreadcrumb();
+    };
     categoryContainer.appendChild(b);
   });
 }
@@ -138,7 +173,9 @@ function renderCategories(){
 function renderYears(){
   yearContainer.innerHTML='';
   years.forEach(y=>{
-    const b=document.createElement('button'); b.textContent=y; b.className='btn btn-year';
+    const b=document.createElement('button');
+    b.textContent=y;
+    b.className='btn btn-year';
     b.onclick=()=>{ selectedYear=y; monthContainer.style.display='block'; renderMonths(); updateBreadcrumb(); };
     yearContainer.appendChild(b);
   });
@@ -147,13 +184,15 @@ function renderYears(){
 function renderMonths(){
   monthContainer.innerHTML='';
   months.forEach(m=>{
-    const b=document.createElement('button'); b.textContent=m; b.className='btn btn-month';
+    const b=document.createElement('button');
+    b.textContent=m;
+    b.className='btn btn-month';
     b.onclick=()=>{ selectedMonth=m; dateContainer.style.display='block'; updateBreadcrumb(); };
     monthContainer.appendChild(b);
   });
 }
 
-// Add date button logic
+// ✅ Add date button logic
 document.getElementById('addDateBtn').onclick=()=>{
   const dateVal=document.getElementById('dateInput').value.trim();
   if(!dateVal){ alert('Enter a date'); return; }
@@ -174,15 +213,20 @@ document.getElementById('addDateBtn').onclick=()=>{
     profilesWrapper.innerHTML='';
     updateBreadcrumb();
 
-    const list=interviewData[selectedCategory]?.[selectedYear]?.[selectedMonth]?.[selectedDate] || [];
-    list.forEach(a=>profilesWrapper.appendChild(createApplicantDiv(a)));
+    if(interviewData[selectedCategory] && interviewData[selectedCategory][selectedYear] &&
+       interviewData[selectedCategory][selectedYear][selectedMonth] &&
+       interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate]){
+         interviewData[selectedCategory][selectedYear][selectedMonth][selectedDate].forEach(a=>{
+           profilesWrapper.appendChild(createApplicantDiv(a));
+         });
+    }
   };
 
   document.getElementById('dateButtonsContainer').appendChild(dateBtn);
   document.getElementById('dateInput').value='';
 };
 
-// Create applicant card
+// ✅ Applicant Card
 function createApplicantDiv(app){
   const div=document.createElement('div');
   div.className='profile-container';
@@ -200,70 +244,27 @@ function createApplicantDiv(app){
       <tr><td class="label">Status:</td><td><select class="status-select"><option>Accepted</option><option>Rejected</option><option>Hold</option></select></td></tr>
       <tr><td class="label">Notes:</td><td><textarea class="notes-input">${app.notes||''}</textarea></td></tr>
     </table>
-    <div class="save-remove-btns">
-      <button class="save-btn">Save</button>
-      <button class="remove-btn">Remove</button>
-    </div>
+    <button class="save-btn">Save</button>
+    <button class="remove-btn">Remove</button>
   `;
   div.querySelector('.status-select').value=app.status||'Accepted';
 
-  // Save single applicant
   div.querySelector('.save-btn').onclick=()=>{
-    const data=extractApplicantData(div);
-    alert(`Saved ${data.name||'Unnamed'} successfully.`);
+    alert('Applicant data saved temporarily.');
   };
-
-  // Remove applicant
-  div.querySelector('.remove-btn').onclick=()=>{
-    if(confirm('Remove this applicant?')) div.remove();
-  };
+  div.querySelector('.remove-btn').onclick=()=>{ div.remove(); };
 
   return div;
 }
 
-function extractApplicantData(div){
-  return {
-    name: div.querySelectorAll('.editable')[0].textContent.trim(),
-    visa: div.querySelectorAll('.editable')[1].textContent.trim(),
-    nationality: div.querySelector('.nationality-select').value,
-    salary: div.querySelectorAll('.editable')[2].textContent.trim(),
-    education: div.querySelector('.education-select').value,
-    contact: div.querySelectorAll('.editable')[3].textContent.trim(),
-    email: div.querySelectorAll('.editable')[4].textContent.trim(),
-    time: div.querySelector('.time-input').value,
-    status: div.querySelector('.status-select').value,
-    notes: div.querySelector('.notes-input').value
-  };
-}
-
-// Add more applicant
+// ✅ Add applicant
 addMoreBtn.onclick=()=>{
   if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate) return;
   const newApp={category:selectedCategory,year:selectedYear,month:selectedMonth,date:selectedDate};
   profilesWrapper.appendChild(createApplicantDiv(newApp));
 };
 
-// Search functionality
-document.getElementById('searchBtn').onclick=()=>{
-  const query=document.getElementById('searchInput').value.toLowerCase();
-  if(!query) return;
-  profilesWrapper.innerHTML='';
-  Object.values(interviewData).forEach(y=>{
-    Object.values(y).forEach(m=>{
-      Object.values(m).forEach(d=>{
-        Object.values(d).forEach(list=>{
-          list.forEach(app=>{
-            const values=Object.values(app).join(' ').toLowerCase();
-            if(values.includes(query)) profilesWrapper.appendChild(createApplicantDiv(app));
-          });
-        });
-      });
-    });
-  });
-};
-
 loadFromServer();
 </script>
 </body>
 </html>
-
