@@ -483,7 +483,7 @@ function createApplicantDiv(app){
   div.dataset.localId = app._localId;
 
   // header includes Category — Month Year — Date
-  const headerText = `${selectedCategory || ''} — ${selectedMonth || ''} ${selectedYear || ''} — ${selectedDate || ''}`;
+  const headerText = `${selectedCategory || ''} — ${selectedDate || ''}`;
   div.innerHTML = `
     <div class="profile-header">${escapeHTML(headerText)}</div>
     <table class="profile-table">
@@ -495,6 +495,13 @@ function createApplicantDiv(app){
       <tr><td>Salary:</td><td><div class="editable salary" contenteditable="true">${escapeHTML(app.salary||'')}</div></td></tr>
       <tr><td>Education:</td><td>
         <select class="education">${educationList.map(e => `<option ${app.education===e ? 'selected':''}>${e}</option>`).join('')}</select>
+      </td></tr>
+       <tr><td>Attested:</td><td>
+        <select class="attested">
+          <option ${ (app.attested||'Yes')==='Yes' ? 'selected':'' }>Yes</option>
+          <option ${ (app.attested||'Yes')==='No' ? 'selected':'' }>No</option>
+          <option ${ (app.attested||'Yes')==='Yes, Home Country, No - UAE' ? 'selected':'' }>Yes, Home Country, No - UAE</option>
+        </select>
       </td></tr>
       <tr><td>Contact:</td><td><div class="editable contact" contenteditable="true">${escapeHTML(app.contact||'')}</div></td></tr>
       <tr><td>Email:</td><td><div class="editable email" contenteditable="true">${escapeHTML(app.email||'')}</div></td></tr>
@@ -518,7 +525,7 @@ function createApplicantDiv(app){
   const statusSelect = div.querySelector('.status');
   function updateStatusColor(sel){
     const v = sel.value;
-    sel.style.color = v === 'Accepted' ? 'green' : v === 'Rejected' ? 'red' : 'orange';
+    sel.style.color = v === 'Accepted' ? 'green' : v === 'Rejected' ? 'red' : v === 'Pending' ? 'orange';
   }
   updateStatusColor(statusSelect);
   statusSelect.addEventListener('change', () => updateStatusColor(statusSelect));
@@ -691,3 +698,4 @@ loadFromServerThenLocal();
 </script>
 </body>
 </html>
+
