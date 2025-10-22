@@ -22,68 +22,42 @@
   .btn-category { background:#004a99; color:#fff; }
   .btn-year, .btn-month { background:#0066cc; color:#fff; }
   .btn-date { position:relative; background:#66ccff; color:#fff; border-radius:10px; margin:4px; padding:8px 14px; display:inline-block; cursor:pointer; font-size:13px; }
+  .btn-date.selected { box-shadow: 0 0 0 3px rgba(0,122,204,0.15); background:#4db8ff; }
   .date-x { position:absolute; top:-6px; right:-6px; background:#cc3300; color:#fff; border-radius:50%; font-size:10px; padding:2px 6px; cursor:pointer; }
   .btn:hover { opacity:0.9; }
 
-  .section { margin-top:15px; display:none; }
-  .date-input-container { margin-top:10px; }
-  .date-input { padding:6px; width:160px; font-size:13px; margin-right:6px; border-radius:6px; border:1px solid #bbb; }
-
-  /* Smaller applicant cards */
-  .profiles-wrapper { display:flex; flex-wrap:wrap; gap:10px; margin-top:15px; align-items:flex-start; }
-  .profile-container { 
-    background: #fff; 
-    border-radius: 6px; 
-    padding: 6px;
-    width: 200px;
-    box-shadow: 1px 1px 4px rgba(0,0,0,0.05); 
-    position: relative;
-    font-size: 12px;
-  }
-
-  .profile-table td { 
-    padding: 2px 3px; 
-    vertical-align: middle; 
-  }
-
-  .editable { 
-    background: #f0f8ff; 
-    border-radius: 3px; 
-    padding: 3px; 
-    display: inline-block; 
-    min-width: 80px;
-  }
+  .section { margin-top:15px; }
+  .date-input-container { margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 
   select, textarea, .time-input { 
     width: 100%; 
-    padding: 4px; 
-    border-radius: 5px; 
+    padding: 6px; 
+    border-radius: 6px; 
     border: 1px solid #ccc; 
     box-sizing: border-box; 
-    font-size: 12px;
+    font-size: 13px;
     background: #f0f8ff;
   }
 
-  textarea { 
-    min-height: 30px; 
-    resize: vertical; 
+  .profiles-wrapper { display:flex; flex-wrap:wrap; gap:10px; margin-top:15px; align-items:flex-start; }
+
+  .profile-container { 
+    background: #fff; 
+    border-radius: 6px; 
+    padding: 8px;
+    width: 260px;
+    box-shadow: 1px 1px 6px rgba(0,0,0,0.06); 
+    position: relative;
+    font-size: 13px;
   }
 
-  .card-actions { 
-    display: flex; 
-    justify-content: flex-end; 
-    gap: 4px; 
-    margin-top: 4px; 
-  }
+  .profile-header { font-weight:700; color:#004a99; font-size:13px; margin-bottom:6px; }
+  .profile-table td { padding: 4px 6px; vertical-align: middle; }
+  .editable { background: #f0f8ff; border-radius: 3px; padding: 4px; display: inline-block; min-width: 100px; }
+  textarea { min-height: 40px; resize: vertical; }
 
-  .save-btn, .remove-btn { 
-    padding: 4px 6px; 
-    border-radius: 4px; 
-    font-size: 11px; 
-    border:none; 
-    cursor:pointer; 
-  }
-
+  .card-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; }
+  .save-btn, .remove-btn { padding: 6px 8px; border-radius: 4px; font-size: 12px; border:none; cursor:pointer; }
   .save-btn { background:#0077cc; color:#fff; }
   .remove-btn { background:#cc3300; color:#fff; }
 
@@ -95,10 +69,25 @@
   #saveAllBtn { background:#0077cc; }
   #clearBtn { background:#cc3300; }
 
+  /* calendar */
+  .calendar-wrap { margin-top:10px; display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; }
+  .calendar { background:#fff; border-radius:8px; padding:10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .cal-header { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
+  .cal-title { font-weight:700; color:#004a99; }
+  .cal-grid { display:grid; grid-template-columns: repeat(7,36px); gap:6px; }
+  .cal-day, .cal-weekday { width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:13px; cursor:pointer; }
+  .cal-weekday { font-weight:700; color:#0066cc; height:24px; cursor:default; background:transparent; }
+  .cal-day:hover { background:#f0f8ff; }
+  .cal-day.disabled { opacity:0.25; cursor:default; }
+  .cal-day.selected { background:#0077cc; color:#fff; }
+  .calendar-small { font-size:12px; color:#666; margin-top:6px; }
+
   /* responsive */
   @media (max-width:720px){
     #searchInput{ width:160px; }
     .profiles-wrapper{ justify-content:center; }
+    .cal-grid { grid-template-columns: repeat(7,32px); gap:4px; }
+    .cal-day, .cal-weekday { width:32px; height:32px; }
   }
 </style>
 </head>
@@ -121,15 +110,38 @@
 
 <!-- controls -->
 <div id="categoryContainer"></div>
-<div id="yearContainer" class="section"></div>
-<div id="monthContainer" class="section"></div>
 
-<div id="dateContainer" class="section">
+<!-- dropdowns for year/month -->
+<div id="yearContainer" class="section" style="display:none;">
+  <label for="yearSelect" style="font-weight:600; color:#004a99;">Year:</label>
+  <select id="yearSelect" class="date-input" aria-label="Year select">
+    <option value="">-- Choose Year --</option>
+  </select>
+</div>
+
+<div id="monthContainer" class="section" style="display:none;">
+  <label for="monthSelect" style="font-weight:600; color:#004a99;">Month:</label>
+  <select id="monthSelect" class="date-input" aria-label="Month select">
+    <option value="">-- Choose Month --</option>
+  </select>
+</div>
+
+<div id="dateContainer" class="section" style="display:none;">
   <div class="date-input-container">
-    <input id="dateInput" class="date-input" placeholder="Enter date (e.g. 2025-10-21)" />
-    <button id="addDateBtn" class="btn btn-month">Add Date</button>
+    <div id="dateButtonsContainer" style="margin-top:8px;"></div>
   </div>
-  <div id="dateButtonsContainer" style="margin-top:8px;"></div>
+
+  <div class="calendar-wrap" id="calendarWrap" style="display:none;">
+    <div class="calendar" id="calendar">
+      <div class="cal-header">
+        <button id="calPrev" class="btn" style="padding:6px 8px; background:#f0f8ff; border-radius:6px;">‹</button>
+        <div class="cal-title" id="calTitle">Month Year</div>
+        <button id="calNext" class="btn" style="padding:6px 8px; background:#f0f8ff; border-radius:6px;">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="calendar-small" id="calendarHint">Click a day to add/select it.</div>
+    </div>
+  </div>
 </div>
 
 <div class="profiles-wrapper" id="profilesWrapper"></div>
@@ -147,7 +159,7 @@
 -------------------------*/
 const API_URL = 'https://dbw-interview.onrender.com/api/applicants';
 const categories = ["PETRA","KEDMA","Logistics Manager","Logistics Assistant","Carpenter","Operations Supervisor","Electrician"];
-const years = ["2025","2026"];
+const years = ["2024","2025","2026","2027"];
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const nationalities = ["Algerian","Bhutanese","Cambodia","Cameroonian","Chad","Colombian","Congo","Ethiopian","Filipina","Gabonese","Ghana","Guinean","Indian","Indonesian","Ivorian","Kenyan","Myanmar","Nepalese","Nigerian","South African","Sierra Leone","Sri Lankan","Tanzanian","Ugandan","Zimbabwe"];
 const educationList = ["Master's","Bachelor's","Bachelor's Diploma","High School","College Diploma","College","College Undergraduate","High School Diploma","Diploma","Certificate","University"];
@@ -157,6 +169,8 @@ const educationList = ["Master's","Bachelor's","Bachelor's Diploma","High School
 -------------------------*/
 let interviewData = {};
 let selectedCategory = null, selectedYear = null, selectedMonth = null, selectedDate = null;
+/* calendar view month/year (numbers) */
+let calendarView = { year: null, monthIndex: null };
 
 /* DOM refs */
 const categoryContainer = document.getElementById('categoryContainer');
@@ -169,29 +183,45 @@ const breadcrumb = document.getElementById('breadcrumb');
 const addMoreBtn = document.getElementById('addMoreBtn');
 const saveAllBtn = document.getElementById('saveAllBtn');
 const clearBtn = document.getElementById('clearBtn');
-const dateInput = document.getElementById('dateInput');
 const searchInput = document.getElementById('searchInput');
 const searchClear = document.getElementById('searchClear');
 const syncStatus = document.getElementById('syncStatus');
+const yearSelect = document.getElementById('yearSelect');
+const monthSelect = document.getElementById('monthSelect');
+const calendarWrap = document.getElementById('calendarWrap');
+const calGrid = document.getElementById('calGrid');
+const calTitle = document.getElementById('calTitle');
+const calPrev = document.getElementById('calPrev');
+const calNext = document.getElementById('calNext');
 
 /* -------------------------
    Utilities
 -------------------------*/
-function saveLocal() { localStorage.setItem('interviewData_v1', JSON.stringify(interviewData)); }
-function loadLocal() {
+function saveLocal(){ localStorage.setItem('interviewData_v1', JSON.stringify(interviewData)); }
+function loadLocal(){
   const raw = localStorage.getItem('interviewData_v1');
   if (!raw) return;
   try { interviewData = JSON.parse(raw) || {}; } catch(e){ interviewData = {}; }
 }
-function ensurePath(cat, yr, mo, dt) {
+function ensurePath(cat, yr, mo, dt){
   if (!interviewData[cat]) interviewData[cat] = {};
   if (!interviewData[cat][yr]) interviewData[cat][yr] = {};
   if (!interviewData[cat][yr][mo]) interviewData[cat][yr][mo] = {};
   if (!interviewData[cat][yr][mo][dt]) interviewData[cat][yr][mo][dt] = [];
   return interviewData[cat][yr][mo][dt];
 }
-function uid() { return 'a_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
-function updateBreadcrumb() {
+function uid(){ return 'a_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
+function formatDateISO(y,m,d){
+  const mm = String(m).padStart(2,'0'), dd = String(d).padStart(2,'0');
+  return `${y}-${mm}-${dd}`;
+}
+function formatDateDisplay(iso){
+  if(!iso) return '';
+  const [y,mm,dd] = iso.split('-');
+  const mi = parseInt(mm,10)-1;
+  return `${categories.includes(selectedCategory)?selectedCategory:''} ${months[mi]} ${y} — ${dd}`;
+}
+function updateBreadcrumb(){
   const crumbs = [];
   if (selectedCategory) crumbs.push(`<span onclick="goBack('category')" style="cursor:pointer">${selectedCategory}</span>`);
   if (selectedYear) crumbs.push(`<span onclick="goBack('year')" style="cursor:pointer">${selectedYear}</span>`);
@@ -208,15 +238,17 @@ window.goBack = function(level){
   addMoreBtn.style.display = 'none';
   yearContainer.style.display = monthContainer.style.display = dateContainer.style.display = 'none';
   renderCategories();
-  if (selectedCategory) renderYears();
-  if (selectedYear) renderMonths();
+  if (selectedCategory) {
+    yearContainer.style.display = 'block';
+    yearSelect.value = selectedYear || '';
+  }
   updateBreadcrumb();
 };
 
 /* -------------------------
-   Server load (optional)
+   Server load (try server, then local)
 -------------------------*/
-async function loadFromServerThenLocal() {
+async function loadFromServerThenLocal(){
   try {
     const res = await fetch(API_URL);
     if (!res.ok) throw new Error('no server');
@@ -238,7 +270,7 @@ async function loadFromServerThenLocal() {
 /* -------------------------
    Rendering logic
 -------------------------*/
-function renderCategories() {
+function renderCategories(){
   categoryContainer.innerHTML = '';
   categories.forEach(c => {
     const btn = document.createElement('button');
@@ -252,7 +284,11 @@ function renderCategories() {
       } else {
         selectedCategory = c;
         yearContainer.style.display = 'block';
+        monthContainer.style.display = 'block';
+        dateContainer.style.display = 'block';
         renderYears();
+        renderMonths(); // prefill months
+        renderDateButtons();
         categoryContainer.querySelectorAll('button').forEach(b => b.style.display = (b.textContent === c ? 'inline-block' : 'none'));
       }
       selectedYear = selectedMonth = selectedDate = null;
@@ -265,54 +301,58 @@ function renderCategories() {
 }
 
 function renderYears(){
-  yearContainer.innerHTML = '';
-  years.forEach(y => {
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-year';
-    btn.textContent = y;
-    btn.onclick = () => {
-      selectedYear = y;
-      selectedMonth = selectedDate = null;
-      monthContainer.style.display = 'block';
-      dateContainer.style.display = 'none';
-      renderMonths();
-      profilesWrapper.innerHTML = '';
-      addMoreBtn.style.display = 'none';
-      updateBreadcrumb();
-    };
-    yearContainer.appendChild(btn);
-  });
+  yearSelect.innerHTML = '<option value="">-- Choose Year --</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
+  yearSelect.onchange = () => {
+    selectedYear = yearSelect.value || null;
+    selectedMonth = selectedDate = null;
+    calendarWrap.style.display = 'none';
+    clearCalendarView();
+    renderDateButtons();
+    profilesWrapper.innerHTML = '';
+    addMoreBtn.style.display = 'none';
+    updateBreadcrumb();
+  };
 }
 
 function renderMonths(){
-  monthContainer.innerHTML = '';
-  months.forEach(m => {
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-month';
-    btn.textContent = m;
-    btn.onclick = () => {
-      selectedMonth = m;
-      selectedDate = null;
-      dateContainer.style.display = 'block';
-      renderDateButtons();
-      profilesWrapper.innerHTML = '';
-      addMoreBtn.style.display = 'none';
-      updateBreadcrumb();
-    };
-    monthContainer.appendChild(btn);
-  });
+  monthSelect.innerHTML = '<option value="">-- Choose Month --</option>' + months.map(m => `<option value="${m}">${m}</option>`).join('');
+  monthSelect.onchange = () => {
+    selectedMonth = monthSelect.value || null;
+    selectedDate = null;
+    profilesWrapper.innerHTML = '';
+    addMoreBtn.style.display = 'none';
+    if (selectedYear && selectedMonth) {
+      // show calendar for this year/month
+      const monthIndex = months.indexOf(selectedMonth);
+      calendarView.year = parseInt(selectedYear,10);
+      calendarView.monthIndex = monthIndex;
+      renderCalendar(calendarView.year, calendarView.monthIndex);
+      calendarWrap.style.display = 'flex';
+    } else {
+      calendarWrap.style.display = 'none';
+    }
+    updateBreadcrumb();
+  };
 }
 
+/* -------------------------
+   Date buttons (existing dates)
+-------------------------*/
 function renderDateButtons(){
   dateButtonsContainer.innerHTML = '';
+  if (!selectedCategory || !selectedYear || !selectedMonth) return;
   const stored = interviewData?.[selectedCategory]?.[selectedYear]?.[selectedMonth] || {};
   Object.keys(stored).sort().forEach(d => createDateButton(d));
 }
 
-function createDateButton(dateVal) {
+function createDateButton(dateVal){
+  // don't duplicate
+  if (Array.from(dateButtonsContainer.children).some(n => n.dataset && n.dataset.date === dateVal)) return;
+
   const dateBtn = document.createElement('div');
   dateBtn.className = 'btn-date';
   dateBtn.textContent = dateVal;
+  dateBtn.dataset.date = dateVal;
 
   const x = document.createElement('span');
   x.className = 'date-x';
@@ -328,6 +368,10 @@ function createDateButton(dateVal) {
   dateBtn.appendChild(x);
 
   dateBtn.onclick = () => {
+    // mark selection visually
+    Array.from(dateButtonsContainer.children).forEach(n => n.classList.remove('selected'));
+    dateBtn.classList.add('selected');
+
     selectedDate = dateVal;
     profilesWrapper.innerHTML = '';
     addMoreBtn.style.display = 'block';
@@ -340,16 +384,108 @@ function createDateButton(dateVal) {
 }
 
 /* -------------------------
-   Applicant card
+   Calendar rendering & interactions
+-------------------------*/
+function clearCalendarView(){
+  calGrid.innerHTML = '';
+  calTitle.textContent = '';
+}
+
+function renderCalendar(year, monthIndex){
+  clearCalendarView();
+  // cal title
+  calTitle.textContent = `${months[monthIndex]} ${year}`;
+
+  // weekdays header
+  const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  weekdays.forEach(w => {
+    const el = document.createElement('div');
+    el.className = 'cal-weekday';
+    el.textContent = w;
+    calGrid.appendChild(el);
+  });
+
+  // first day of month
+  const first = new Date(year, monthIndex, 1);
+  const startDay = first.getDay(); // 0..6
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+
+  // previous month's trailing days (optional show as disabled)
+  for (let i = 0; i < startDay; i++){
+    const el = document.createElement('div');
+    el.className = 'cal-day disabled';
+    el.textContent = '';
+    calGrid.appendChild(el);
+  }
+
+  // generate day cells
+  for (let d = 1; d <= daysInMonth; d++){
+    const iso = formatDateISO(year, monthIndex + 1, d);
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+
+    // style if already added date (exists in stored)
+    const exists = interviewData?.[selectedCategory]?.[String(year)]?.[months[monthIndex]]?.[iso];
+    if (exists) {
+      el.classList.add('cal-day-added');
+      // visually indicate by a small dot or background when selected
+      // we'll rely on the date buttons for selection, calendar only for adding/selecting
+    }
+
+    el.onclick = () => {
+      if (!selectedCategory || !selectedYear || !selectedMonth) {
+        alert('Please select category, year and month first.');
+        return;
+      }
+      // create path & date entry if missing
+      ensurePath(selectedCategory, String(year), months[monthIndex], iso);
+      saveLocal();
+
+      // create or re-render date button and simulate click
+      createDateButton(iso);
+      // simulate click on the created button
+      const btn = Array.from(dateButtonsContainer.children).find(n => n.dataset && n.dataset.date === iso);
+      if (btn) btn.click();
+    };
+
+    calGrid.appendChild(el);
+  }
+}
+
+/* calendar prev/next */
+calPrev.onclick = () => {
+  if (calendarView.monthIndex === null) return;
+  calendarView.monthIndex -= 1;
+  if (calendarView.monthIndex < 0) {
+    calendarView.monthIndex = 11;
+    calendarView.year -= 1;
+  }
+  renderCalendar(calendarView.year, calendarView.monthIndex);
+};
+calNext.onclick = () => {
+  if (calendarView.monthIndex === null) return;
+  calendarView.monthIndex += 1;
+  if (calendarView.monthIndex > 11) {
+    calendarView.monthIndex = 0;
+    calendarView.year += 1;
+  }
+  renderCalendar(calendarView.year, calendarView.monthIndex);
+};
+
+/* -------------------------
+   Applicant card creation & logic
 -------------------------*/
 function createApplicantDiv(app){
   if (!app._localId) app._localId = app.id || uid();
-
   const div = document.createElement('div');
   div.className = 'profile-container';
   div.dataset.localId = app._localId;
 
+  // header includes Category — Month Year — Date
+  const headerText = `${selectedCategory || ''} — ${selectedMonth || ''} ${selectedYear || ''} — ${selectedDate || ''}`;
   div.innerHTML = `
+    <div class="profile-header">${escapeHTML(headerText)}</div>
     <table class="profile-table">
       <tr><td>Name:</td><td><div class="editable name" contenteditable="true">${escapeHTML(app.name||'')}</div></td></tr>
       <tr><td>Visa:</td><td><div class="editable visa" contenteditable="true">${escapeHTML(app.visa||'')}</div></td></tr>
@@ -378,19 +514,16 @@ function createApplicantDiv(app){
     </div>
   `;
 
-  // Status color
+  // status color
   const statusSelect = div.querySelector('.status');
-  function updateStatusColor(sel) {
+  function updateStatusColor(sel){
     const v = sel.value;
-    sel.style.color =
-      v === 'Accepted' ? 'green' :
-      v === 'Rejected' ? 'red' :
-      v === 'Pending' ? 'orange' : 'inherit';
+    sel.style.color = v === 'Accepted' ? 'green' : v === 'Rejected' ? 'red' : 'orange';
   }
   updateStatusColor(statusSelect);
   statusSelect.addEventListener('change', () => updateStatusColor(statusSelect));
 
-  // Save button logic
+  // Save logic
   const saveBtn = div.querySelector('.save-btn');
   saveBtn.onclick = () => {
     const updated = collectDataFromDiv(div);
@@ -401,18 +534,18 @@ function createApplicantDiv(app){
     alert('Applicant saved locally!');
   };
 
-  // Remove button logic
+  // Remove logic
   const removeBtn = div.querySelector('.remove-btn');
   removeBtn.onclick = () => {
     if (!confirm('Remove this applicant?')) return;
     const arr = ensurePath(selectedCategory, selectedYear, selectedMonth, selectedDate);
     const idx = arr.findIndex(a => a._localId === app._localId);
-    if (idx >= 0) arr.splice(idx, 1);
+    if (idx >= 0) arr.splice(idx,1);
     div.remove();
     saveLocal();
   };
 
-  // Keyboard navigation
+  // Keyboard navigation (ArrowUp/ArrowDown) among fields
   const focusableElements = Array.from(div.querySelectorAll('input, select, textarea, .editable'));
   focusableElements.forEach((el, idx) => {
     el.addEventListener('keydown', (e) => {
@@ -421,7 +554,12 @@ function createApplicantDiv(app){
         const next = focusableElements[idx + 1] || focusableElements[0];
         next.focus();
         if (next.contentEditable === "true") {
-          document.getSelection().collapse(next, 0);
+          const range = document.createRange();
+          range.selectNodeContents(next);
+          range.collapse(true);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
         }
       }
       if (e.key === 'ArrowUp') {
@@ -429,7 +567,12 @@ function createApplicantDiv(app){
         const prev = focusableElements[idx - 1] || focusableElements[focusableElements.length - 1];
         prev.focus();
         if (prev.contentEditable === "true") {
-          document.getSelection().collapse(prev, 0);
+          const range = document.createRange();
+          range.selectNodeContents(prev);
+          range.collapse(true);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
         }
       }
     });
@@ -466,6 +609,10 @@ function collectDataFromDiv(div){
    Add / Save All / Clear
 -------------------------*/
 addMoreBtn.onclick = () => {
+  if (!selectedCategory || !selectedYear || !selectedMonth || !selectedDate) {
+    alert('Please select a date first.');
+    return;
+  }
   const arr = ensurePath(selectedCategory, selectedYear, selectedMonth, selectedDate);
   const newApp = { _localId: uid(), name: '', visa: '', status: 'Pending' };
   arr.push(newApp);
@@ -476,10 +623,12 @@ addMoreBtn.onclick = () => {
 saveAllBtn.onclick = async () => {
   syncStatus.textContent = '⏳ Syncing...';
   const allApplicants = [];
-  Object.values(interviewData).forEach(years =>
-    Object.values(years).forEach(months =>
-      Object.values(months).forEach(dates =>
-        Object.values(dates).forEach(arr => arr.forEach(a => allApplicants.push(a)))
+  Object.keys(interviewData).forEach(cat =>
+    Object.keys(interviewData[cat]).forEach(yr =>
+      Object.keys(interviewData[cat][yr]).forEach(mo =>
+        Object.keys(interviewData[cat][yr][mo]).forEach(dt =>
+          interviewData[cat][yr][mo][dt].forEach(a => allApplicants.push(a))
+        )
       )
     )
   );
@@ -502,8 +651,7 @@ clearBtn.onclick = () => {
   localStorage.removeItem('interviewData_v1');
   profilesWrapper.innerHTML = '';
   categoryContainer.innerHTML = '';
-  yearContainer.innerHTML = '';
-  monthContainer.innerHTML = '';
+  yearContainer.style.display = monthContainer.style.display = dateContainer.style.display = 'none';
   dateButtonsContainer.innerHTML = '';
   breadcrumb.innerHTML = '';
   addMoreBtn.style.display = 'none';
@@ -524,7 +672,6 @@ searchInput.addEventListener('input', () => {
     c.style.display = text.includes(q) ? '' : 'none';
   });
 });
-
 searchClear.onclick = () => {
   searchInput.value = '';
   document.querySelectorAll('.profile-container').forEach(c => c.style.display = '');
