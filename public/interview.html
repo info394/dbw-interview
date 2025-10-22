@@ -30,17 +30,55 @@
   .date-input { padding:6px; width:160px; font-size:14px; margin-right:6px; border-radius:6px; border:1px solid #bbb; }
 
   .profiles-wrapper { display:flex; flex-wrap:wrap; gap:12px; margin-top:18px; align-items:flex-start; }
-  .profile-container { background:#fff; border-radius:8px; padding:12px; width:300px; box-shadow:2px 2px 8px rgba(0,0,0,0.06); position:relative; }
-  .profile-label { font-weight:700; color:#004a99; margin-bottom:8px; }
-  .profile-table td { padding:4px 6px; vertical-align:middle; }
-  .label { width:40%; color:#004a99; font-weight:600; }
-  .editable { background:#f7faff; border-radius:4px; padding:6px; display:inline-block; min-width:120px; }
-  select, textarea, .time-input { width:100%; padding:6px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; }
-  textarea { min-height:44px; resize:vertical; }
+  .profile-container { 
+  background: #fff; 
+  border-radius: 8px; 
+  padding: 8px;           /* reduced from 12px */
+  width: 240px;           /* reduced from 300px */
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.05); 
+  position: relative;
+  font-size: 13px;        /* slightly smaller text */
+}
 
-  .card-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:8px; }
-  .save-btn { background:#004a99; color:#fff; border:none; padding:8px 10px; border-radius:6px; cursor:pointer; }
-  .remove-btn { background:#cc3300; color:#fff; border:none; padding:8px 10px; border-radius:6px; cursor:pointer; }
+.profile-table td { 
+  padding: 3px 4px;       /* tighter table spacing */
+  vertical-align: middle; 
+}
+
+.editable { 
+  background: #f7faff; 
+  border-radius: 4px; 
+  padding: 4px;           /* reduced padding */
+  display: inline-block; 
+  min-width: 100px;       /* smaller min width */
+}
+
+select, textarea, .time-input { 
+  width: 100%; 
+  padding: 5px; 
+  border-radius: 6px; 
+  border: 1px solid #ccc; 
+  box-sizing: border-box; 
+  font-size: 13px;        /* smaller font */
+}
+
+textarea { 
+  min-height: 36px;       /* reduced height */
+  resize: vertical; 
+}
+
+.card-actions { 
+  display: flex; 
+  justify-content: flex-end; 
+  gap: 6px; 
+  margin-top: 6px; 
+}
+
+.save-btn, .remove-btn { 
+  padding: 6px 8px;       /* smaller buttons */
+  border-radius: 5px; 
+  font-size: 12px; 
+}
 
   #controls { margin-top:18px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
   #addMoreBtn { display:none; }
@@ -556,3 +594,4 @@ function unescapeHTML(s){ return String(s||'').replace(/&amp;|&lt;|&gt;|&quot;|&
 </script>
 </body>
 </html>
+
