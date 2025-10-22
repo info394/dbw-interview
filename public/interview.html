@@ -11,13 +11,9 @@
   h1 { color:#004a99; margin:0 0 6px 0; }
   h2.subheading, h3.subheading { color:#004a99; font-weight:400; margin:4px 0; font-size:16px; }
   #breadcrumb { margin: 10px 0; font-size:14px; color:#004a99; text-align:left; }
-
-  /* search */
   #searchContainer { display:flex; gap:8px; align-items:center; }
   #searchInput { padding:8px; width:260px; border-radius:8px; border:1px solid #ccc; }
   #searchClear { background:#ccc; border:none; padding:8px;border-radius:8px; cursor:pointer; }
-
-  /* buttons */
   .btn { padding: 10px 14px; margin: 4px; font-size: 14px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s; }
   .btn-category { background:#004a99; color:#fff; }
   .btn-year, .btn-month { background:#0066cc; color:#fff; }
@@ -25,10 +21,8 @@
   .btn-date.selected { box-shadow: 0 0 0 3px rgba(0,122,204,0.15); background:#4db8ff; }
   .date-x { position:absolute; top:-6px; right:-6px; background:#cc3300; color:#fff; border-radius:50%; font-size:10px; padding:2px 6px; cursor:pointer; }
   .btn:hover { opacity:0.9; }
-
   .section { margin-top:15px; }
   .date-input-container { margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-
   select, textarea, .time-input { 
     width: 100%; 
     padding: 6px; 
@@ -38,9 +32,7 @@
     font-size: 13px;
     background: #f0f8ff;
   }
-
   .profiles-wrapper { display:flex; flex-wrap:wrap; gap:10px; margin-top:15px; align-items:flex-start; }
-
   .profile-container { 
     background: #fff; 
     border-radius: 6px; 
@@ -50,26 +42,20 @@
     position: relative;
     font-size: 13px;
   }
-
   .profile-header { font-weight:700; color:#004a99; font-size:13px; margin-bottom:6px; }
   .profile-table td { padding: 4px 6px; vertical-align: middle; }
   .editable { background: #f0f8ff; border-radius: 3px; padding: 4px; display: inline-block; min-width: 100px; }
   textarea { min-height: 40px; resize: vertical; }
-
   .card-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; }
   .save-btn, .remove-btn { padding: 6px 8px; border-radius: 4px; font-size: 12px; border:none; cursor:pointer; }
   .save-btn { background:#0077cc; color:#fff; }
   .remove-btn { background:#cc3300; color:#fff; }
-
   .status { font-weight: 600; }
-
   #controls { margin-top:15px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   #addMoreBtn { display:none; }
   #saveAllBtn, #clearBtn { padding:8px 12px; border-radius:6px; border:none; color:#fff; cursor:pointer; font-size:13px; }
   #saveAllBtn { background:#0077cc; }
   #clearBtn { background:#cc3300; }
-
-  /* calendar */
   .calendar-wrap { margin-top:10px; display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; }
   .calendar { background:#fff; border-radius:8px; padding:10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
   .cal-header { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
@@ -81,8 +67,6 @@
   .cal-day.disabled { opacity:0.25; cursor:default; }
   .cal-day.selected { background:#0077cc; color:#fff; }
   .calendar-small { font-size:12px; color:#666; margin-top:6px; }
-
-  /* responsive */
   @media (max-width:720px){
     #searchInput{ width:160px; }
     .profiles-wrapper{ justify-content:center; }
@@ -108,10 +92,8 @@
 
 <div id="breadcrumb"></div>
 
-<!-- controls -->
 <div id="categoryContainer"></div>
 
-<!-- dropdowns for year/month -->
 <div id="yearContainer" class="section" style="display:none;">
   <label for="yearSelect" style="font-weight:600; color:#004a99;">Year:</label>
   <select id="yearSelect" class="date-input" aria-label="Year select">
@@ -130,7 +112,6 @@
   <div class="date-input-container">
     <div id="dateButtonsContainer" style="margin-top:8px;"></div>
   </div>
-
   <div class="calendar-wrap" id="calendarWrap" style="display:none;">
     <div class="calendar" id="calendar">
       <div class="cal-header">
@@ -163,13 +144,13 @@ const years = ["2024","2025","2026","2027"];
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const nationalities = ["Algerian","Bhutanese","Cambodia","Cameroonian","Chad","Colombian","Congo","Ethiopian","Filipina","Gabonese","Ghana","Guinean","Indian","Indonesian","Ivorian","Kenyan","Myanmar","Nepalese","Nigerian","South African","Sierra Leone","Sri Lankan","Tanzanian","Ugandan","Zimbabwe"];
 const educationList = ["Master's","Bachelor's","Bachelor's Diploma","High School","College Diploma","College","College Undergraduate","High School Diploma","Diploma","Certificate","University"];
+const attestedOptions = ["Yes","No","Attested in home country but not in UAE"];
 
 /* -------------------------
    State
 -------------------------*/
 let interviewData = {};
 let selectedCategory = null, selectedYear = null, selectedMonth = null, selectedDate = null;
-/* calendar view month/year (numbers) */
 let calendarView = { year: null, monthIndex: null };
 
 /* DOM refs */
@@ -211,491 +192,206 @@ function ensurePath(cat, yr, mo, dt){
   return interviewData[cat][yr][mo][dt];
 }
 function uid(){ return 'a_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
-function formatDateISO(y,m,d){
-  const mm = String(m).padStart(2,'0'), dd = String(d).padStart(2,'0');
-  return `${y}-${mm}-${dd}`;
-}
-function formatDateDisplay(iso){
-  if(!iso) return '';
-  const [y,mm,dd] = iso.split('-');
-  const mi = parseInt(mm,10)-1;
-  return `${categories.includes(selectedCategory)?selectedCategory:''} ${months[mi]} ${y} — ${dd}`;
-}
+function formatDateISO(y,m,d){ const mm=String(m).padStart(2,'0'), dd=String(d).padStart(2,'0'); return `${y}-${mm}-${dd}`; }
+function formatDateDisplay(iso){ if(!iso) return ''; const [y,mm,dd]=iso.split('-'); return `${dd}-${mm}-${y}`; }
 function updateBreadcrumb(){
   const crumbs = [];
   if (selectedCategory) crumbs.push(`<span onclick="goBack('category')" style="cursor:pointer">${selectedCategory}</span>`);
   if (selectedYear) crumbs.push(`<span onclick="goBack('year')" style="cursor:pointer">${selectedYear}</span>`);
   if (selectedMonth) crumbs.push(`<span onclick="goBack('month')" style="cursor:pointer">${selectedMonth}</span>`);
-  if (selectedDate) crumbs.push(`<span onclick="goBack('date')" style="cursor:pointer">${selectedDate}</span>`);
+  if (selectedDate) crumbs.push(`<span onclick="goBack('date')" style="cursor:pointer">${formatDateDisplay(selectedDate)}</span>`);
   breadcrumb.innerHTML = crumbs.join(' > ');
 }
 window.goBack = function(level){
-  if (level === 'category') selectedCategory = selectedYear = selectedMonth = selectedDate = null;
-  else if (level === 'year') selectedYear = selectedMonth = selectedDate = null;
-  else if (level === 'month') selectedMonth = selectedDate = null;
-  else if (level === 'date') selectedDate = null;
-  profilesWrapper.innerHTML = '';
-  addMoreBtn.style.display = 'none';
-  yearContainer.style.display = monthContainer.style.display = dateContainer.style.display = 'none';
+  if (level==='category') selectedCategory=selectedYear=selectedMonth=selectedDate=null;
+  else if(level==='year') selectedYear=selectedMonth=selectedDate=null;
+  else if(level==='month') selectedMonth=selectedDate=null;
+  else if(level==='date') selectedDate=null;
+  profilesWrapper.innerHTML='';
+  addMoreBtn.style.display='none';
+  yearContainer.style.display=monthContainer.style.display=dateContainer.style.display='none';
   renderCategories();
-  if (selectedCategory) {
-    yearContainer.style.display = 'block';
-    yearSelect.value = selectedYear || '';
-  }
+  if(selectedCategory){ yearContainer.style.display='block'; yearSelect.value=selectedYear||''; }
   updateBreadcrumb();
 };
 
 /* -------------------------
-   Server load (try server, then local)
+   Server load / Local fallback
 -------------------------*/
 async function loadFromServerThenLocal(){
   try {
     const res = await fetch(API_URL);
-    if (!res.ok) throw new Error('no server');
+    if(!res.ok) throw new Error('no server');
     const arr = await res.json();
-    interviewData = {};
-    arr.forEach(it => {
-      if(!it.category || !it.year || !it.month || !it.date) return;
-      ensurePath(it.category, it.year, it.month, it.date);
-      interviewData[it.category][it.year][it.month][it.date].push(it);
-    });
+    interviewData={};
+    arr.forEach(it=>{ if(!it.category||!it.year||!it.month||!it.date) return; ensurePath(it.category,it.year,it.month,it.date).push(it); });
     saveLocal();
     renderCategories();
-  } catch (e) {
-    loadLocal();
-    renderCategories();
-  }
+  } catch(e){ loadLocal(); renderCategories(); }
 }
 
 /* -------------------------
-   Rendering logic
+   Render categories
 -------------------------*/
 function renderCategories(){
-  categoryContainer.innerHTML = '';
-  categories.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-category';
-    btn.textContent = c;
-    btn.onclick = () => {
-      if (selectedCategory === c) {
-        selectedCategory = null;
-        yearContainer.style.display = monthContainer.style.display = dateContainer.style.display = 'none';
-        categoryContainer.querySelectorAll('button').forEach(b => b.style.display = 'inline-block');
-      } else {
-        selectedCategory = c;
-        yearContainer.style.display = 'block';
-        monthContainer.style.display = 'block';
-        dateContainer.style.display = 'block';
-        renderYears();
-        renderMonths(); // prefill months
-        renderDateButtons();
-        categoryContainer.querySelectorAll('button').forEach(b => b.style.display = (b.textContent === c ? 'inline-block' : 'none'));
+  categoryContainer.innerHTML='';
+  categories.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='btn btn-category';
+    btn.textContent=c;
+    btn.onclick=()=>{
+      if(selectedCategory===c){ selectedCategory=null; yearContainer.style.display=monthContainer.style.display=dateContainer.style.display='none'; categoryContainer.querySelectorAll('button').forEach(b=>b.style.display='inline-block'); }
+      else{
+        selectedCategory=c;
+        yearContainer.style.display=monthContainer.style.display=dateContainer.style.display='block';
+        renderYears(); renderMonths(); renderDateButtons();
+        categoryContainer.querySelectorAll('button').forEach(b=>b.style.display=(b.textContent===c?'inline-block':'none'));
       }
-      selectedYear = selectedMonth = selectedDate = null;
-      profilesWrapper.innerHTML = '';
-      addMoreBtn.style.display = 'none';
-      updateBreadcrumb();
+      selectedYear=selectedMonth=selectedDate=null; profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; updateBreadcrumb();
     };
     categoryContainer.appendChild(btn);
   });
 }
 
 function renderYears(){
-  yearSelect.innerHTML = '<option value="">-- Choose Year --</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
-  yearSelect.onchange = () => {
-    selectedYear = yearSelect.value || null;
-    selectedMonth = selectedDate = null;
-    calendarWrap.style.display = 'none';
-    clearCalendarView();
-    renderDateButtons();
-    profilesWrapper.innerHTML = '';
-    addMoreBtn.style.display = 'none';
-    updateBreadcrumb();
+  yearSelect.innerHTML='<option value="">-- Choose Year --</option>'+years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  yearSelect.onchange=()=>{
+    selectedYear=yearSelect.value||null; selectedMonth=selectedDate=null; calendarWrap.style.display='none'; clearCalendarView(); renderDateButtons(); profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; updateBreadcrumb();
   };
 }
 
 function renderMonths(){
-  monthSelect.innerHTML = '<option value="">-- Choose Month --</option>' + months.map(m => `<option value="${m}">${m}</option>`).join('');
-  monthSelect.onchange = () => {
-    selectedMonth = monthSelect.value || null;
-    selectedDate = null;
-    profilesWrapper.innerHTML = '';
-    addMoreBtn.style.display = 'none';
-    if (selectedYear && selectedMonth) {
-      // show calendar for this year/month
-      const monthIndex = months.indexOf(selectedMonth);
-      calendarView.year = parseInt(selectedYear,10);
-      calendarView.monthIndex = monthIndex;
-      renderCalendar(calendarView.year, calendarView.monthIndex);
-      calendarWrap.style.display = 'flex';
-    } else {
-      calendarWrap.style.display = 'none';
-    }
+  monthSelect.innerHTML='<option value="">-- Choose Month --</option>'+months.map(m=>`<option value="${m}">${m}</option>`).join('');
+  monthSelect.onchange=()=>{
+    selectedMonth=monthSelect.value||null; selectedDate=null; profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
+    if(selectedYear && selectedMonth){ calendarView.year=parseInt(selectedYear,10); calendarView.monthIndex=months.indexOf(selectedMonth); renderCalendar(calendarView.year,calendarView.monthIndex); calendarWrap.style.display='flex'; }
+    else calendarWrap.style.display='none';
     updateBreadcrumb();
   };
 }
 
 /* -------------------------
-   Date buttons (existing dates)
+   Date buttons
 -------------------------*/
 function renderDateButtons(){
-  dateButtonsContainer.innerHTML = '';
-  if (!selectedCategory || !selectedYear || !selectedMonth) return;
+  dateButtonsContainer.innerHTML='';
+  if(!selectedCategory || !selectedYear || !selectedMonth) return;
   const stored = interviewData?.[selectedCategory]?.[selectedYear]?.[selectedMonth] || {};
-  Object.keys(stored).sort().forEach(d => createDateButton(d));
+  Object.keys(stored).sort().forEach(d=>createDateButton(d));
 }
 
 function createDateButton(dateVal){
-  // don't duplicate
-  if (Array.from(dateButtonsContainer.children).some(n => n.dataset && n.dataset.date === dateVal)) return;
-
-  const dateBtn = document.createElement('div');
-  dateBtn.className = 'btn-date';
-  dateBtn.textContent = dateVal;
-  dateBtn.dataset.date = dateVal;
-
-  const x = document.createElement('span');
-  x.className = 'date-x';
-  x.textContent = '×';
-  x.onclick = (ev) => {
-    ev.stopPropagation();
-    if (!confirm('Delete this date and all applicants for it?')) return;
-    delete interviewData[selectedCategory][selectedYear][selectedMonth][dateVal];
-    saveLocal();
-    dateBtn.remove();
-    if (selectedDate === dateVal) { selectedDate = null; profilesWrapper.innerHTML = ''; addMoreBtn.style.display = 'none'; updateBreadcrumb(); }
-  };
+  if(Array.from(dateButtonsContainer.children).some(n=>n.dataset && n.dataset.date===dateVal)) return;
+  const dateBtn=document.createElement('div'); dateBtn.className='btn-date'; dateBtn.textContent=formatDateDisplay(dateVal); dateBtn.dataset.date=dateVal;
+  const x=document.createElement('span'); x.className='date-x'; x.textContent='×'; x.onclick=ev=>{ ev.stopPropagation(); if(!confirm('Delete this date and all applicants for it?')) return; delete interviewData[selectedCategory][selectedYear][selectedMonth][dateVal]; saveLocal(); dateBtn.remove(); if(selectedDate===dateVal){ selectedDate=null; profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; updateBreadcrumb(); } };
   dateBtn.appendChild(x);
-
-  dateBtn.onclick = () => {
-    // mark selection visually
-    Array.from(dateButtonsContainer.children).forEach(n => n.classList.remove('selected'));
-    dateBtn.classList.add('selected');
-
-    selectedDate = dateVal;
-    profilesWrapper.innerHTML = '';
-    addMoreBtn.style.display = 'block';
-    const list = interviewData?.[selectedCategory]?.[selectedYear]?.[selectedMonth]?.[selectedDate] || [];
-    list.forEach(app => profilesWrapper.appendChild(createApplicantDiv(app)));
-    updateBreadcrumb();
+  dateBtn.onclick=()=>{
+    Array.from(dateButtonsContainer.children).forEach(n=>n.classList.remove('selected'));
+    dateBtn.classList.add('selected'); selectedDate=dateVal; updateBreadcrumb(); renderApplicants(); addMoreBtn.style.display='inline-block';
   };
-
   dateButtonsContainer.appendChild(dateBtn);
 }
 
 /* -------------------------
-   Calendar rendering & interactions
+   Applicants
 -------------------------*/
-function clearCalendarView(){
-  calGrid.innerHTML = '';
-  calTitle.textContent = '';
+function renderApplicants(){
+  profilesWrapper.innerHTML='';
+  if(!selectedCategory || !selectedYear || !selectedMonth || !selectedDate) return;
+  const arr = ensurePath(selectedCategory,selectedYear,selectedMonth,selectedDate);
+  arr.forEach(app=>profilesWrapper.appendChild(createApplicantCard(app)));
 }
 
-function renderCalendar(year, monthIndex){
-  clearCalendarView();
-  // cal title
-  calTitle.textContent = `${months[monthIndex]} ${year}`;
-
-  // weekdays header
-  const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  weekdays.forEach(w => {
-    const el = document.createElement('div');
-    el.className = 'cal-weekday';
-    el.textContent = w;
-    calGrid.appendChild(el);
-  });
-
-  // first day of month
-  const first = new Date(year, monthIndex, 1);
-  const startDay = first.getDay(); // 0..6
-  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-
-  // previous month's trailing days (optional show as disabled)
-  for (let i = 0; i < startDay; i++){
-    const el = document.createElement('div');
-    el.className = 'cal-day disabled';
-    el.textContent = '';
-    calGrid.appendChild(el);
-  }
-
-  // generate day cells
-  for (let d = 1; d <= daysInMonth; d++){
-    const iso = formatDateISO(year, monthIndex + 1, d);
-    const el = document.createElement('div');
-    el.className = 'cal-day';
-    el.textContent = d;
-
-    // style if already added date (exists in stored)
-    const exists = interviewData?.[selectedCategory]?.[String(year)]?.[months[monthIndex]]?.[iso];
-    if (exists) {
-      el.classList.add('cal-day-added');
-      // visually indicate by a small dot or background when selected
-      // we'll rely on the date buttons for selection, calendar only for adding/selecting
+function createApplicantCard(app){
+  const container=document.createElement('div'); container.className='profile-container';
+  const header=document.createElement('div'); header.className='profile-header'; header.textContent=`${selectedCategory} – ${formatDateDisplay(selectedDate)}`;
+  container.appendChild(header);
+  const table=document.createElement('table'); table.className='profile-table';
+  const fields=[
+    ['Name','name'],['Visa','visa'],['Nationality','nationality'],['Salary','salary'],['Education','education'],['Attested','attested'],['Contact','contact'],['Email','email'],['Time','time'],['Status','status'],['Notes','notes']
+  ];
+  fields.forEach(([label,field])=>{
+    const tr=document.createElement('tr');
+    const tdLabel=document.createElement('td'); tdLabel.textContent=label;
+    const tdValue=document.createElement('td');
+    if(field==='nationality'){
+      const sel=document.createElement('select'); nationalities.forEach(n=>{ const op=document.createElement('option'); op.value=n; op.textContent=n; if(app.nationality===n) op.selected=true; sel.appendChild(op); }); sel.onchange=()=>{ app.nationality=sel.value; saveLocal(); }; tdValue.appendChild(sel);
+    } else if(field==='education'){
+      const sel=document.createElement('select'); educationList.forEach(n=>{ const op=document.createElement('option'); op.value=n; op.textContent=n; if(app.education===n) op.selected=true; sel.appendChild(op); }); sel.onchange=()=>{ app.education=sel.value; saveLocal(); }; tdValue.appendChild(sel);
+    } else if(field==='attested'){
+      const sel=document.createElement('select'); attestedOptions.forEach(n=>{ const op=document.createElement('option'); op.value=n; op.textContent=n; if(app.attested===n) op.selected=true; sel.appendChild(op); }); sel.onchange=()=>{ app.attested=sel.value; saveLocal(); }; tdValue.appendChild(sel);
+    } else if(field==='status'){
+      const sel=document.createElement('select'); ['Pending','Accepted','Rejected'].forEach(n=>{ const op=document.createElement('option'); op.value=n; op.textContent=n; if(app.status===n) op.selected=true; sel.appendChild(op); }); sel.onchange=()=>{ app.status=sel.value; saveLocal(); }; tdValue.appendChild(sel);
+    } else if(field==='notes'){
+      const ta=document.createElement('textarea'); ta.value=app.notes||''; ta.oninput=()=>{ app.notes=ta.value; saveLocal(); }; tdValue.appendChild(ta);
+    } else if(field==='time'){
+      const inp=document.createElement('input'); inp.type='time'; inp.value=app.time||''; inp.className='time-input'; inp.oninput=()=>{ app.time=inp.value; saveLocal(); }; tdValue.appendChild(inp);
+    } else {
+      const span=document.createElement('span'); span.className='editable'; span.contentEditable='true'; span.textContent=app[field]||''; span.oninput=()=>{ app[field]=span.textContent; saveLocal(); };
+      tdValue.appendChild(span);
     }
-
-    el.onclick = () => {
-      if (!selectedCategory || !selectedYear || !selectedMonth) {
-        alert('Please select category, year and month first.');
-        return;
-      }
-      // create path & date entry if missing
-      ensurePath(selectedCategory, String(year), months[monthIndex], iso);
-      saveLocal();
-
-      // create or re-render date button and simulate click
-      createDateButton(iso);
-      // simulate click on the created button
-      const btn = Array.from(dateButtonsContainer.children).find(n => n.dataset && n.dataset.date === iso);
-      if (btn) btn.click();
-    };
-
-    calGrid.appendChild(el);
-  }
-}
-
-/* calendar prev/next */
-calPrev.onclick = () => {
-  if (calendarView.monthIndex === null) return;
-  calendarView.monthIndex -= 1;
-  if (calendarView.monthIndex < 0) {
-    calendarView.monthIndex = 11;
-    calendarView.year -= 1;
-  }
-  renderCalendar(calendarView.year, calendarView.monthIndex);
-};
-calNext.onclick = () => {
-  if (calendarView.monthIndex === null) return;
-  calendarView.monthIndex += 1;
-  if (calendarView.monthIndex > 11) {
-    calendarView.monthIndex = 0;
-    calendarView.year += 1;
-  }
-  renderCalendar(calendarView.year, calendarView.monthIndex);
-};
-
-/* -------------------------
-   Applicant card creation & logic
--------------------------*/
-function createApplicantDiv(app){
-  if (!app._localId) app._localId = app.id || uid();
-  const div = document.createElement('div');
-  div.className = 'profile-container';
-  div.dataset.localId = app._localId;
-
-  // header includes Category — Month Year — Date
-  const headerText = `${selectedCategory || ''} — ${selectedDate || ''}`;
-  div.innerHTML = `
-    <div class="profile-header">${escapeHTML(headerText)}</div>
-    <table class="profile-table">
-      <tr><td>Name:</td><td><div class="editable name" contenteditable="true">${escapeHTML(app.name||'')}</div></td></tr>
-      <tr><td>Visa:</td><td><div class="editable visa" contenteditable="true">${escapeHTML(app.visa||'')}</div></td></tr>
-      <tr><td>Nationality:</td><td>
-        <select class="nationality">${nationalities.map(n => `<option ${app.nationality===n ? 'selected':''}>${n}</option>`).join('')}</select>
-      </td></tr>
-      <tr><td>Salary:</td><td><div class="editable salary" contenteditable="true">${escapeHTML(app.salary||'')}</div></td></tr>
-      <tr><td>Education:</td><td>
-        <select class="education">${educationList.map(e => `<option ${app.education===e ? 'selected':''}>${e}</option>`).join('')}</select>
-      </td></tr>
-       <tr><td>Attested:</td><td>
-        <select class="attested">
-          <option ${ (app.attested||'Yes')==='Yes' ? 'selected':'' }>Yes</option>
-          <option ${ (app.attested||'Yes')==='No' ? 'selected':'' }>No</option>
-          <option ${ (app.attested||'Yes')==='Yes, Home Country, No - UAE' ? 'selected':'' }>Yes, Home Country, No - UAE</option>
-        </select>
-      </td></tr>
-      <tr><td>Contact:</td><td><div class="editable contact" contenteditable="true">${escapeHTML(app.contact||'')}</div></td></tr>
-      <tr><td>Email:</td><td><div class="editable email" contenteditable="true">${escapeHTML(app.email||'')}</div></td></tr>
-      <tr><td>Time:</td><td><input class="time-input" type="time" value="${app.time||''}"></td></tr>
-      <tr><td>Status:</td><td>
-        <select class="status">
-          <option ${ (app.status||'Pending')==='Accepted' ? 'selected':'' }>Accepted</option>
-          <option ${ (app.status||'Pending')==='Rejected' ? 'selected':'' }>Rejected</option>
-          <option ${ (app.status||'Pending')==='Pending' ? 'selected':'' }>Pending</option>
-        </select>
-      </td></tr>
-      <tr><td>Notes:</td><td><textarea class="notes">${escapeHTML(app.notes||'')}</textarea></td></tr>
-    </table>
-    <div class="card-actions">
-      <button class="save-btn">Save</button>
-      <button class="remove-btn">Remove</button>
-    </div>
-  `;
-
-  // status color
-  const statusSelect = div.querySelector('.status');
-  function updateStatusColor(sel){
-    const v = sel.value;
-    sel.style.color = v === 'Accepted' ? 'green' : v === 'Rejected' ? 'red' : v === 'Pending' ? 'orange';
-  }
-  updateStatusColor(statusSelect);
-  statusSelect.addEventListener('change', () => updateStatusColor(statusSelect));
-
-  // Save logic
-  const saveBtn = div.querySelector('.save-btn');
-  saveBtn.onclick = () => {
-    const updated = collectDataFromDiv(div);
-    const arr = ensurePath(selectedCategory, selectedYear, selectedMonth, selectedDate);
-    const idx = arr.findIndex(a => a._localId === updated._localId);
-    if (idx >= 0) arr[idx] = updated; else arr.push(updated);
-    saveLocal();
-    alert('Applicant saved locally!');
-  };
-
-  // Remove logic
-  const removeBtn = div.querySelector('.remove-btn');
-  removeBtn.onclick = () => {
-    if (!confirm('Remove this applicant?')) return;
-    const arr = ensurePath(selectedCategory, selectedYear, selectedMonth, selectedDate);
-    const idx = arr.findIndex(a => a._localId === app._localId);
-    if (idx >= 0) arr.splice(idx,1);
-    div.remove();
-    saveLocal();
-  };
-
-  // Keyboard navigation (ArrowUp/ArrowDown) among fields
-  const focusableElements = Array.from(div.querySelectorAll('input, select, textarea, .editable'));
-  focusableElements.forEach((el, idx) => {
-    el.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        const next = focusableElements[idx + 1] || focusableElements[0];
-        next.focus();
-        if (next.contentEditable === "true") {
-          const range = document.createRange();
-          range.selectNodeContents(next);
-          range.collapse(true);
-          const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        const prev = focusableElements[idx - 1] || focusableElements[focusableElements.length - 1];
-        prev.focus();
-        if (prev.contentEditable === "true") {
-          const range = document.createRange();
-          range.selectNodeContents(prev);
-          range.collapse(true);
-          const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
-      }
-    });
+    tr.appendChild(tdLabel); tr.appendChild(tdValue); table.appendChild(tr);
   });
-
-  return div;
+  container.appendChild(table);
+  const actions=document.createElement('div'); actions.className='card-actions';
+  const saveBtn=document.createElement('button'); saveBtn.className='save-btn'; saveBtn.textContent='Save'; saveBtn.onclick=()=>{ saveLocal(); alert('Saved locally'); };
+  const removeBtn=document.createElement('button'); removeBtn.className='remove-btn'; removeBtn.textContent='Remove'; removeBtn.onclick=()=>{ if(confirm('Remove this applicant?')){ const arr=ensurePath(selectedCategory,selectedYear,selectedMonth,selectedDate); const idx=arr.indexOf(app); if(idx>-1){ arr.splice(idx,1); saveLocal(); container.remove(); } } };
+  actions.appendChild(saveBtn); actions.appendChild(removeBtn); container.appendChild(actions);
+  return container;
 }
 
 /* -------------------------
-   Helper to read applicant fields
+   Add More
 -------------------------*/
-function collectDataFromDiv(div){
-  return {
-    _localId: div.dataset.localId,
-    id: div.dataset.id || null,
-    category: selectedCategory,
-    year: selectedYear,
-    month: selectedMonth,
-    date: selectedDate,
-    name: div.querySelector('.name')?.textContent.trim(),
-    visa: div.querySelector('.visa')?.textContent.trim(),
-    nationality: div.querySelector('.nationality')?.value,
-    salary: div.querySelector('.salary')?.textContent.trim(),
-    education: div.querySelector('.education')?.value,
-    contact: div.querySelector('.contact')?.textContent.trim(),
-    email: div.querySelector('.email')?.textContent.trim(),
-    time: div.querySelector('.time-input')?.value,
-    status: div.querySelector('.status')?.value,
-    notes: div.querySelector('.notes')?.value
-  };
-}
-
-/* -------------------------
-   Add / Save All / Clear
--------------------------*/
-addMoreBtn.onclick = () => {
-  if (!selectedCategory || !selectedYear || !selectedMonth || !selectedDate) {
-    alert('Please select a date first.');
-    return;
-  }
-  const arr = ensurePath(selectedCategory, selectedYear, selectedMonth, selectedDate);
-  const newApp = { _localId: uid(), name: '', visa: '', status: 'Pending' };
-  arr.push(newApp);
-  profilesWrapper.appendChild(createApplicantDiv(newApp));
+addMoreBtn.onclick=()=>{
+  if(!selectedCategory||!selectedYear||!selectedMonth||!selectedDate) return;
+  const newApp={ name:'', visa:'', nationality:nationalities[0], salary:'', education:educationList[0], attested:attestedOptions[0], contact:'', email:'', time:'', status:'Pending', notes:'' };
+  ensurePath(selectedCategory,selectedYear,selectedMonth,selectedDate).push(newApp);
   saveLocal();
-};
-
-saveAllBtn.onclick = async () => {
-  syncStatus.textContent = '⏳ Syncing...';
-  const allApplicants = [];
-  Object.keys(interviewData).forEach(cat =>
-    Object.keys(interviewData[cat]).forEach(yr =>
-      Object.keys(interviewData[cat][yr]).forEach(mo =>
-        Object.keys(interviewData[cat][yr][mo]).forEach(dt =>
-          interviewData[cat][yr][mo][dt].forEach(a => allApplicants.push(a))
-        )
-      )
-    )
-  );
-  try {
-    const res = await fetch(API_URL + '/bulk', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(allApplicants)
-    });
-    if (!res.ok) throw new Error('Server error');
-    syncStatus.textContent = '✅ Synced with server!';
-  } catch (e) {
-    syncStatus.textContent = '⚠️ Failed to sync (saved locally only)';
-  }
-};
-
-clearBtn.onclick = () => {
-  if (!confirm('Clear all local data?')) return;
-  interviewData = {};
-  localStorage.removeItem('interviewData_v1');
-  profilesWrapper.innerHTML = '';
-  categoryContainer.innerHTML = '';
-  yearContainer.style.display = monthContainer.style.display = dateContainer.style.display = 'none';
-  dateButtonsContainer.innerHTML = '';
-  breadcrumb.innerHTML = '';
-  addMoreBtn.style.display = 'none';
-  renderCategories();
+  profilesWrapper.appendChild(createApplicantCard(newApp));
 };
 
 /* -------------------------
-   Search
+   Calendar
 -------------------------*/
-searchInput.addEventListener('input', () => {
-  const q = searchInput.value.toLowerCase().trim();
-  if (!q) {
-    document.querySelectorAll('.profile-container').forEach(c => c.style.display = '');
-    return;
+function renderCalendar(y,m){
+  calTitle.textContent=`${months[m]} ${y}`; calGrid.innerHTML='';
+  const firstDay=new Date(y,m,1).getDay(), lastDay=new Date(y,m+1,0).getDate();
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{ const w=document.createElement('div'); w.className='cal-weekday'; w.textContent=d; calGrid.appendChild(w); });
+  for(let i=0;i<firstDay;i++){ const dummy=document.createElement('div'); dummy.className='cal-day disabled'; calGrid.appendChild(dummy); }
+  for(let d=1;d<=lastDay;d++){
+    const day=document.createElement('div'); day.className='cal-day'; day.textContent=d;
+    const iso=formatDateISO(y,m+1,d); if(interviewData?.[selectedCategory]?.[selectedYear]?.[selectedMonth]?.[iso]) day.classList.add('selected');
+    day.onclick=()=>{ selectedDate=iso; createDateButton(iso); updateBreadcrumb(); renderApplicants(); addMoreBtn.style.display='inline-block'; Array.from(dateButtonsContainer.children).forEach(n=>n.classList.remove('selected')); Array.from(dateButtonsContainer.children).find(n=>n.dataset.date===iso)?.classList.add('selected'); };
+    calGrid.appendChild(day);
   }
-  document.querySelectorAll('.profile-container').forEach(c => {
-    const text = c.textContent.toLowerCase();
-    c.style.display = text.includes(q) ? '' : 'none';
-  });
-});
-searchClear.onclick = () => {
-  searchInput.value = '';
-  document.querySelectorAll('.profile-container').forEach(c => c.style.display = '');
-};
-
-/* -------------------------
-   Misc utils
--------------------------*/
-function escapeHTML(str){
-  return str ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : '';
 }
+calPrev.onclick=()=>{ if(calendarView.monthIndex===0){ calendarView.year--; calendarView.monthIndex=11; } else calendarView.monthIndex--; renderCalendar(calendarView.year,calendarView.monthIndex); };
+calNext.onclick=()=>{ if(calendarView.monthIndex===11){ calendarView.year++; calendarView.monthIndex=0; } else calendarView.monthIndex++; renderCalendar(calendarView.year,calendarView.monthIndex); };
+function clearCalendarView(){ calendarWrap.style.display='none'; calGrid.innerHTML=''; }
 
 /* -------------------------
-   Startup
+   Save/Clear/Search
+-------------------------*/
+saveAllBtn.onclick=async()=>{
+  syncStatus.textContent='Syncing...';
+  try{
+    const payload=[];
+    Object.keys(interviewData).forEach(cat=>{ Object.keys(interviewData[cat]).forEach(yr=>{ Object.keys(interviewData[cat][yr]).forEach(mo=>{ Object.keys(interviewData[cat][yr][mo]).forEach(dt=>{ interviewData[cat][yr][mo][dt].forEach(a=>payload.push(a)); }); }); }); });
+    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!res.ok) throw new Error('Sync failed'); syncStatus.textContent='Sync successful';
+  } catch(e){ syncStatus.textContent='Sync failed: '+e.message; }
+};
+clearBtn.onclick=()=>{ if(confirm('Clear all local data?')){ localStorage.removeItem('interviewData_v1'); location.reload(); }; };
+searchInput.oninput=()=>{ const q=searchInput.value.toLowerCase(); Array.from(profilesWrapper.children).forEach(card=>{ let show=false; Array.from(card.querySelectorAll('span.editable, textarea, select, input')).forEach(f=>{ if(f.value?.toLowerCase().includes(q) || f.textContent?.toLowerCase().includes(q)) show=true; }); card.style.display=show?'block':'none'; });
+};
+searchClear.onclick=()=>{ searchInput.value=''; searchInput.oninput(); };
+
+/* -------------------------
+   Init
 -------------------------*/
 loadFromServerThenLocal();
 </script>
+
 </body>
 </html>
-
