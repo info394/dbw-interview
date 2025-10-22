@@ -29,26 +29,32 @@
   .date-input-container { margin-top:10px; }
   .date-input { padding:6px; width:160px; font-size:13px; margin-right:6px; border-radius:6px; border:1px solid #bbb; }
 
-  /* Smaller applicant cards */
+  /* Applicant card blue theme */
   .profiles-wrapper { display:flex; flex-wrap:wrap; gap:10px; margin-top:15px; align-items:flex-start; }
   .profile-container { 
-    background: #fff; 
-    border-radius: 6px; 
-    padding: 6px;
-    width: 200px;
-    box-shadow: 1px 1px 4px rgba(0,0,0,0.05); 
+    background: linear-gradient(145deg, #eaf4ff, #f8fbff); 
+    border: 1.5px solid #007bff; 
+    border-radius: 10px; 
+    padding: 10px; 
+    width: 220px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08); 
     position: relative;
     font-size: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .profile-container:hover { 
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
   }
 
   .profile-table td { 
-    padding: 2px 3px; 
+    padding: 3px 4px; 
     vertical-align: middle; 
   }
 
   .editable { 
     background: #f8faff; 
-    border-radius: 3px; 
+    border-radius: 4px; 
     padding: 3px; 
     display: inline-block; 
     min-width: 80px;
@@ -72,7 +78,7 @@
     display: flex; 
     justify-content: flex-end; 
     gap: 4px; 
-    margin-top: 4px; 
+    margin-top: 6px; 
   }
 
   .save-btn, .remove-btn { 
@@ -86,7 +92,7 @@
   .save-btn { background:#0077cc; color:#fff; }
   .remove-btn { background:#cc3300; color:#fff; }
 
-  .status { font-weight: 600; }
+  .status { font-weight: 600; transition: color 0.2s ease-in-out; }
 
   #controls { margin-top:15px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   #addMoreBtn { display:none; }
@@ -118,7 +124,6 @@
 
 <div id="breadcrumb"></div>
 
-<!-- controls -->
 <div id="categoryContainer"></div>
 <div id="yearContainer" class="section"></div>
 <div id="monthContainer" class="section"></div>
@@ -141,9 +146,6 @@
 </div>
 
 <script>
-/* -------------------------
-   Config
--------------------------*/
 const API_URL = 'https://dbw-interview.onrender.com/api/applicants';
 const categories = ["PETRA","KEDMA","Logistics Manager","Logistics Assistant","Carpenter","Operations Supervisor","Electrician"];
 const years = ["2025","2026"];
@@ -151,13 +153,9 @@ const months = ["January","February","March","April","May","June","July","August
 const nationalities = ["Algerian","Bhutanese","Cambodia","Cameroonian","Chad","Colombian","Congo","Ethiopian","Filipina","Gabonese","Ghana","Guinean","Indian","Indonesian","Ivorian","Kenyan","Myanmar","Nepalese","Nigerian","South African","Sierra Leone","Sri Lankan","Tanzanian","Ugandan","Zimbabwe"];
 const educationList = ["Master's","Bachelor's","Bachelor's Diploma","High School","College Diploma","College","College Undergraduate","High School Diploma","Diploma","Certificate","University"];
 
-/* -------------------------
-   State
--------------------------*/
 let interviewData = {};
 let selectedCategory = null, selectedYear = null, selectedMonth = null, selectedDate = null;
 
-/* DOM refs */
 const categoryContainer = document.getElementById('categoryContainer');
 const yearContainer = document.getElementById('yearContainer');
 const monthContainer = document.getElementById('monthContainer');
@@ -173,239 +171,106 @@ const searchInput = document.getElementById('searchInput');
 const searchClear = document.getElementById('searchClear');
 const syncStatus = document.getElementById('syncStatus');
 
-/* -------------------------
-   Utilities
--------------------------*/
-function saveLocal() { localStorage.setItem('interviewData_v1', JSON.stringify(interviewData)); }
-function loadLocal() {
-  const raw = localStorage.getItem('interviewData_v1');
-  if (!raw) return;
-  try { interviewData = JSON.parse(raw) || {}; } catch(e){ interviewData = {}; }
+function saveLocal(){ localStorage.setItem('interviewData_v1', JSON.stringify(interviewData)); }
+function loadLocal(){ const raw = localStorage.getItem('interviewData_v1'); if(!raw)return; try{interviewData=JSON.parse(raw)||{};}catch(e){interviewData={};}}
+function ensurePath(c,y,m,d){ if(!interviewData[c])interviewData[c]={}; if(!interviewData[c][y])interviewData[c][y]={}; if(!interviewData[c][y][m])interviewData[c][y][m]={}; if(!interviewData[c][y][m][d])interviewData[c][y][m][d]=[]; return interviewData[c][y][m][d]; }
+function uid(){return 'a_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);}
+function updateBreadcrumb(){
+  const crumbs=[];
+  if(selectedCategory)crumbs.push(`<span onclick="goBack('category')" style="cursor:pointer">${selectedCategory}</span>`);
+  if(selectedYear)crumbs.push(`<span onclick="goBack('year')" style="cursor:pointer">${selectedYear}</span>`);
+  if(selectedMonth)crumbs.push(`<span onclick="goBack('month')" style="cursor:pointer">${selectedMonth}</span>`);
+  if(selectedDate)crumbs.push(`<span onclick="goBack('date')" style="cursor:pointer">${selectedDate}</span>`);
+  breadcrumb.innerHTML=crumbs.join(' > ');
 }
-function ensurePath(cat, yr, mo, dt) {
-  if (!interviewData[cat]) interviewData[cat] = {};
-  if (!interviewData[cat][yr]) interviewData[cat][yr] = {};
-  if (!interviewData[cat][yr][mo]) interviewData[cat][yr][mo] = {};
-  if (!interviewData[cat][yr][mo][dt]) interviewData[cat][yr][mo][dt] = [];
-  return interviewData[cat][yr][mo][dt];
-}
-function uid() { return 'a_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
-function updateBreadcrumb() {
-  const crumbs = [];
-  if (selectedCategory) crumbs.push(`<span onclick="goBack('category')" style="cursor:pointer">${selectedCategory}</span>`);
-  if (selectedYear) crumbs.push(`<span onclick="goBack('year')" style="cursor:pointer">${selectedYear}</span>`);
-  if (selectedMonth) crumbs.push(`<span onclick="goBack('month')" style="cursor:pointer">${selectedMonth}</span>`);
-  if (selectedDate) crumbs.push(`<span onclick="goBack('date')" style="cursor:pointer">${selectedDate}</span>`);
-  breadcrumb.innerHTML = crumbs.join(' > ');
-}
-window.goBack = function(level){
-  if (level === 'category') selectedCategory = selectedYear = selectedMonth = selectedDate = null;
-  else if (level === 'year') selectedYear = selectedMonth = selectedDate = null;
-  else if (level === 'month') selectedMonth = selectedDate = null;
-  else if (level === 'date') selectedDate = null;
-  profilesWrapper.innerHTML = '';
-  addMoreBtn.style.display = 'none';
-  yearContainer.style.display = monthContainer.style.display = dateContainer.style.display = 'none';
-  renderCategories();
-  if (selectedCategory) renderYears();
-  if (selectedYear) renderMonths();
-  updateBreadcrumb();
+window.goBack=function(lvl){
+  if(lvl==='category')selectedCategory=selectedYear=selectedMonth=selectedDate=null;
+  else if(lvl==='year')selectedYear=selectedMonth=selectedDate=null;
+  else if(lvl==='month')selectedMonth=selectedDate=null;
+  else if(lvl==='date')selectedDate=null;
+  profilesWrapper.innerHTML=''; addMoreBtn.style.display='none';
+  yearContainer.style.display=monthContainer.style.display=dateContainer.style.display='none';
+  renderCategories(); if(selectedCategory)renderYears(); if(selectedYear)renderMonths(); updateBreadcrumb();
 };
 
-/* -------------------------
-   Server load (optional)
--------------------------*/
-async function loadFromServerThenLocal() {
-  try {
-    const res = await fetch(API_URL);
-    if (!res.ok) throw new Error('no server');
-    const arr = await res.json();
-    interviewData = {};
-    arr.forEach(it => {
-      if(!it.category || !it.year || !it.month || !it.date) return;
-      ensurePath(it.category, it.year, it.month, it.date);
+async function loadFromServerThenLocal(){
+  try{
+    const res=await fetch(API_URL);
+    if(!res.ok)throw new Error('no server');
+    const arr=await res.json(); interviewData={};
+    arr.forEach(it=>{ if(!it.category||!it.year||!it.month||!it.date)return;
+      ensurePath(it.category,it.year,it.month,it.date);
       interviewData[it.category][it.year][it.month][it.date].push(it);
     });
-    saveLocal();
-    renderCategories();
-  } catch (e) {
-    loadLocal();
-    renderCategories();
-  }
+    saveLocal(); renderCategories();
+  }catch(e){ loadLocal(); renderCategories(); }
 }
 
-/* -------------------------
-   Rendering logic
--------------------------*/
-function renderCategories() {
-  categoryContainer.innerHTML = '';
-  categories.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-category';
-    btn.textContent = c;
-    btn.onclick = () => {
-      if (selectedCategory === c) {
-        selectedCategory = null;
-        yearContainer.style.display = monthContainer.style.display = dateContainer.style.display = 'none';
-        categoryContainer.querySelectorAll('button').forEach(b => b.style.display = 'inline-block');
-      } else {
-        selectedCategory = c;
-        yearContainer.style.display = 'block';
-        renderYears();
-        categoryContainer.querySelectorAll('button').forEach(b => b.style.display = (b.textContent === c ? 'inline-block' : 'none'));
-      }
-      selectedYear = selectedMonth = selectedDate = null;
-      profilesWrapper.innerHTML = '';
-      addMoreBtn.style.display = 'none';
-      updateBreadcrumb();
+function renderCategories(){
+  categoryContainer.innerHTML='';
+  categories.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='btn btn-category'; btn.textContent=c;
+    btn.onclick=()=>{
+      if(selectedCategory===c){selectedCategory=null; yearContainer.style.display=monthContainer.style.display=dateContainer.style.display='none'; categoryContainer.querySelectorAll('button').forEach(b=>b.style.display='inline-block');}
+      else{selectedCategory=c; yearContainer.style.display='block'; renderYears(); categoryContainer.querySelectorAll('button').forEach(b=>b.style.display=(b.textContent===c?'inline-block':'none'));}
+      selectedYear=selectedMonth=selectedDate=null; profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; updateBreadcrumb();
     };
     categoryContainer.appendChild(btn);
   });
 }
-
-function renderYears(){
-  yearContainer.innerHTML = '';
-  years.forEach(y => {
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-year';
-    btn.textContent = y;
-    btn.onclick = () => {
-      selectedYear = y;
-      selectedMonth = selectedDate = null;
-      monthContainer.style.display = 'block';
-      dateContainer.style.display = 'none';
-      renderMonths();
-      profilesWrapper.innerHTML = '';
-      addMoreBtn.style.display = 'none';
-      updateBreadcrumb();
-    };
-    yearContainer.appendChild(btn);
-  });
-}
-
-function renderMonths(){
-  monthContainer.innerHTML = '';
-  months.forEach(m => {
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-month';
-    btn.textContent = m;
-    btn.onclick = () => {
-      selectedMonth = m;
-      selectedDate = null;
-      dateContainer.style.display = 'block';
-      renderDateButtons();
-      profilesWrapper.innerHTML = '';
-      addMoreBtn.style.display = 'none';
-      updateBreadcrumb();
-    };
-    monthContainer.appendChild(btn);
-  });
-}
-
-function renderDateButtons(){
-  dateButtonsContainer.innerHTML = '';
-  const stored = interviewData?.[selectedCategory]?.[selectedYear]?.[selectedMonth] || {};
-  Object.keys(stored).sort().forEach(d => createDateButton(d));
-}
-
-function createDateButton(dateVal) {
-  const dateBtn = document.createElement('div');
-  dateBtn.className = 'btn-date';
-  dateBtn.textContent = dateVal;
-
-  const x = document.createElement('span');
-  x.className = 'date-x';
-  x.textContent = '×';
-  x.onclick = (ev) => {
-    ev.stopPropagation();
-    if (!confirm('Delete this date and all applicants for it?')) return;
-    delete interviewData[selectedCategory][selectedYear][selectedMonth][dateVal];
-    saveLocal();
-    dateBtn.remove();
-    if (selectedDate === dateVal) { selectedDate = null; profilesWrapper.innerHTML = ''; addMoreBtn.style.display = 'none'; updateBreadcrumb(); }
-  };
+function renderYears(){ yearContainer.innerHTML=''; years.forEach(y=>{const btn=document.createElement('button'); btn.className='btn btn-year'; btn.textContent=y; btn.onclick=()=>{selectedYear=y; selectedMonth=selectedDate=null; monthContainer.style.display='block'; dateContainer.style.display='none'; renderMonths(); profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; updateBreadcrumb();}; yearContainer.appendChild(btn);});}
+function renderMonths(){ monthContainer.innerHTML=''; months.forEach(m=>{const btn=document.createElement('button'); btn.className='btn btn-month'; btn.textContent=m; btn.onclick=()=>{selectedMonth=m; selectedDate=null; dateContainer.style.display='block'; renderDateButtons(); profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; updateBreadcrumb();}; monthContainer.appendChild(btn);});}
+function renderDateButtons(){ dateButtonsContainer.innerHTML=''; const stored=interviewData?.[selectedCategory]?.[selectedYear]?.[selectedMonth]||{}; Object.keys(stored).sort().forEach(d=>createDateButton(d));}
+function createDateButton(dateVal){ const dateBtn=document.createElement('div'); dateBtn.className='btn-date'; dateBtn.textContent=dateVal;
+  const x=document.createElement('span'); x.className='date-x'; x.textContent='×';
+  x.onclick=(ev)=>{ev.stopPropagation(); if(!confirm('Delete this date and all applicants for it?'))return; delete interviewData[selectedCategory][selectedYear][selectedMonth][dateVal]; saveLocal(); dateBtn.remove(); if(selectedDate===dateVal){selectedDate=null; profilesWrapper.innerHTML=''; addMoreBtn.style.display='none'; updateBreadcrumb();}};
   dateBtn.appendChild(x);
-
-  dateBtn.onclick = () => {
-    selectedDate = dateVal;
-    profilesWrapper.innerHTML = '';
-    addMoreBtn.style.display = 'block';
-    const list = interviewData?.[selectedCategory]?.[selectedYear]?.[selectedMonth]?.[selectedDate] || [];
-    list.forEach(app => profilesWrapper.appendChild(createApplicantDiv(app)));
-    updateBreadcrumb();
-  };
-
+  dateBtn.onclick=()=>{selectedDate=dateVal; profilesWrapper.innerHTML=''; addMoreBtn.style.display='block'; const list=interviewData?.[selectedCategory]?.[selectedYear]?.[selectedMonth]?.[selectedDate]||[]; list.forEach(app=>profilesWrapper.appendChild(createApplicantDiv(app))); updateBreadcrumb();};
   dateButtonsContainer.appendChild(dateBtn);
 }
 
-/* -------------------------
-   Applicant card
--------------------------*/
 function createApplicantDiv(app){
-  if (!app._localId) app._localId = app.id || uid();
-
-  const div = document.createElement('div');
-  div.className = 'profile-container';
-  div.dataset.localId = app._localId;
-
-  div.innerHTML = `
+  if(!app._localId)app._localId=app.id||uid();
+  const div=document.createElement('div'); div.className='profile-container'; div.dataset.localId=app._localId;
+  div.innerHTML=`
     <table class="profile-table">
       <tr><td>Name:</td><td><div class="editable name" contenteditable="true">${escapeHTML(app.name||'')}</div></td></tr>
       <tr><td>Visa:</td><td><div class="editable visa" contenteditable="true">${escapeHTML(app.visa||'')}</div></td></tr>
-      <tr><td>Nationality:</td><td>
-        <select class="nationality">${nationalities.map(n => `<option ${app.nationality===n ? 'selected':''}>${n}</option>`).join('')}</select>
-      </td></tr>
+      <tr><td>Nationality:</td><td><select class="nationality">${nationalities.map(n=>`<option ${app.nationality===n?'selected':''}>${n}</option>`).join('')}</select></td></tr>
       <tr><td>Salary:</td><td><div class="editable salary" contenteditable="true">${escapeHTML(app.salary||'')}</div></td></tr>
-      <tr><td>Education:</td><td>
-        <select class="education">${educationList.map(e => `<option ${app.education===e ? 'selected':''}>${e}</option>`).join('')}</select>
-      </td></tr>
+      <tr><td>Education:</td><td><select class="education">${educationList.map(e=>`<option ${app.education===e?'selected':''}>${e}</option>`).join('')}</select></td></tr>
       <tr><td>Contact:</td><td><div class="editable contact" contenteditable="true">${escapeHTML(app.contact||'')}</div></td></tr>
       <tr><td>Email:</td><td><div class="editable email" contenteditable="true">${escapeHTML(app.email||'')}</div></td></tr>
       <tr><td>Time:</td><td><input class="time-input" type="time" value="${app.time||''}"></td></tr>
-      <tr><td>Status:</td><td>
-        <select class="status">
-          <option ${ (app.status||'Pending')==='Accepted' ? 'selected':'' }>Accepted</option>
-          <option ${ (app.status||'Pending')==='Rejected' ? 'selected':'' }>Rejected</option>
-          <option ${ (app.status||'Pending')==='Not Accepted' ? 'selected':'' }>Not Accepted</option>
-          <option ${ (app.status||'Pending')==='Pending' ? 'selected':'' }>Pending</option>
-        </select>
-      </td></tr>
+      <tr><td>Status:</td><td><select class="status">
+        <option ${(app.status||'Pending')==='Accepted'?'selected':''}>Accepted</option>
+        <option ${(app.status||'Pending')==='Rejected'?'selected':''}>Rejected</option>
+        <option ${(app.status||'Pending')==='Pending'?'selected':''}>Pending</option>
+      </select></td></tr>
       <tr><td>Notes:</td><td><textarea class="notes">${escapeHTML(app.notes||'')}</textarea></td></tr>
     </table>
-    <div class="card-actions">
-      <button class="save-btn">Save</button>
-      <button class="remove-btn">Remove</button>
-    </div>
+    <div class="card-actions"><button class="save-btn">Save</button><button class="remove-btn">Remove</button></div>
   `;
 
-  // Status color
-  const statusSelect = div.querySelector('.status');
-  function updateStatusColor(sel) {
-    const v = sel.value;
-    sel.style.color =
-      v === 'Accepted' ? 'green' :
-      v === 'Rejected' ? '
-      v === 'Rejected' ? 'red' :
-      v === 'Not Accepted' ? 'black' :
-      v === 'Pending' ? 'orange' : 'inherit';
+  const statusSelect=div.querySelector('.status');
+  function updateStatusColor(sel){
+    const v=sel.value;
+    sel.style.color= v==='Accepted'?'green': v==='Rejected'?'red': v==='Pending'?'orange':'inherit';
   }
   updateStatusColor(statusSelect);
-  statusSelect.addEventListener('change', () => updateStatusColor(statusSelect));
+  statusSelect.addEventListener('change',()=>updateStatusColor(statusSelect));
 
-  // Save button logic
-  const saveBtn = div.querySelector('.save-btn');
-  saveBtn.onclick = () => {
-    const updated = collectDataFromDiv(div);
-    const arr = ensurePath(selectedCategory, selectedYear, selectedMonth, selectedDate);
-    const idx = arr.findIndex(a => a._localId === updated._localId);
-    if (idx >= 0) arr[idx] = updated; else arr.push(updated);
-    saveLocal();
+  const focusable=div.querySelectorAll('.editable, select, textarea, input');
+  focusable.forEach((el,i)=>{ el.addEventListener('keydown',(e)=>{ if(e.key==='ArrowDown'){ e.preventDefault(); const next=focusable[i+1]; if(next)next.focus(); }});});
+
+  div.querySelector('.save-btn').onclick=()=>{ const updated=collectDataFromDiv(div); const arr=ensurePath(selectedCategory,selectedYear,selectedMonth,selectedDate); const idx=arr.findIndex(a=>a._localId===updated._localId); if(idx>=0)arr[idx]=updated; else arr.push(updated);
+
+      saveLocal();
     alert('Applicant saved locally!');
   };
 
-  // Remove button logic
-  const removeBtn = div.querySelector('.remove-btn');
-  removeBtn.onclick = () => {
+  div.querySelector('.remove-btn').onclick = () => {
     if (!confirm('Remove this applicant?')) return;
     const arr = ensurePath(selectedCategory, selectedYear, selectedMonth, selectedDate);
     const idx = arr.findIndex(a => a._localId === app._localId);
@@ -417,10 +282,7 @@ function createApplicantDiv(app){
   return div;
 }
 
-/* -------------------------
-   Helper to read applicant fields
--------------------------*/
-function collectDataFromDiv(div){
+function collectDataFromDiv(div) {
   return {
     _localId: div.dataset.localId,
     id: div.dataset.id || null,
@@ -509,16 +371,10 @@ searchClear.onclick = () => {
   document.querySelectorAll('.profile-container').forEach(c => c.style.display = '');
 };
 
-/* -------------------------
-   Misc utils
--------------------------*/
 function escapeHTML(str){
   return str ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : '';
 }
 
-/* -------------------------
-   Startup
--------------------------*/
 loadFromServerThenLocal();
 </script>
 </body>
