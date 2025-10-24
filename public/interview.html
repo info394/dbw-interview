@@ -321,7 +321,17 @@ function createApplicantCard(app){
     } else if(field==='attested'){
       const sel=document.createElement('select'); attestedOptions.forEach(n=>{ const op=document.createElement('option'); op.value=n; op.textContent=n; if(app.attested===n) op.selected=true; sel.appendChild(op); }); sel.onchange=()=>{ app.attested=sel.value; saveLocal(); }; tdValue.appendChild(sel);
     } else if(field==='status'){
-      const sel=document.createElement('select'); ['Pending','Accepted','Rejected'].forEach(n=>{ const op=document.createElement('option'); op.value=n; op.textContent=n; if(app.status===n) op.selected=true; sel.appendChild(op); }); sel.onchange=()=>{ app.status=sel.value; saveLocal(); }; tdValue.appendChild(sel);
+      const sel=document.createElement('select'); ['Pending','Accepted','Rejected'].forEach(n=>{ const op=document.createElement('option'); op.value=n; op.textContent=n; if(app.status===n) op.selected=true; sel.appendChild(op); });
+      // Color code by status
+      function updateColor() {
+        sel.style.background = app.status === 'Accepted' ? '#28a745' :
+                               app.status === 'Rejected' ? '#dc3545' :
+                               '#ff9800';
+        sel.style.color = '#fff';
+      }
+      sel.onchange=()=>{ app.status=sel.value; updateColor(); saveLocal(); };
+      updateColor();
+      tdValue.appendChild(sel);
     } else if(field==='notes'){
       const ta=document.createElement('textarea'); ta.value=app.notes||''; ta.oninput=()=>{ app.notes=ta.value; saveLocal(); }; tdValue.appendChild(ta);
     } else if(field==='time'){
@@ -383,9 +393,17 @@ saveAllBtn.onclick=async()=>{
   } catch(e){ syncStatus.textContent='Sync failed: '+e.message; }
 };
 clearBtn.onclick=()=>{ if(confirm('Clear all local data?')){ localStorage.removeItem('interviewData_v1'); location.reload(); }; };
-searchInput.oninput=()=>{ const q=searchInput.value.toLowerCase(); Array.from(profilesWrapper.children).forEach(card=>{ let show=false; Array.from(card.querySelectorAll('span.editable, textarea, select, input')).forEach(f=>{ if(f.value?.toLowerCase().includes(q) || f.textContent?.toLowerCase().includes(q)) show=true; }); card.style.display=show?'block':'none'; });
-};
-searchClear.onclick=()=>{ searchInput.value=''; searchInput.oninput(); };
+
+/* --- Fixed search --- */
+searchInput.addEventListener('input', ()=>{
+  const q = searchInput.value.toLowerCase().trim();
+  const cards = profilesWrapper.querySelectorAll('.profile-container');
+  cards.forEach(card=>{
+    const text = card.innerText.toLowerCase();
+    card.style.display = text.includes(q) ? 'block' : 'none';
+  });
+});
+searchClear.onclick=()=>{ searchInput.value=''; searchInput.dispatchEvent(new Event('input')); };
 
 /* -------------------------
    Init
@@ -395,3 +413,4 @@ loadFromServerThenLocal();
 
 </body>
 </html>
+
